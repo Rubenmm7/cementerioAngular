@@ -1,21 +1,27 @@
-import { HttpInterceptorFn } from '@angular/common/http';
+import { HttpRequest, HttpHandlerFn, HttpEvent } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
-export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
-
-  const token = localStorage.getItem('token');
-
-  // No añadir token al login
+// JWT Interceptor para añadir el token a las peticiones HTTP
+export function JwtInterceptor(req: HttpRequest<unknown>, next: HttpHandlerFn): Observable<HttpEvent<unknown>> {
+  
+  //No tocar auth
   if (req.url.includes('/api/auth')) {
     return next(req);
   }
 
+  //Leer token
+  const token = localStorage.getItem('token');
+
+  //Añadir Authorization si existe
   if (token) {
-    const authReq = req.clone({
-      headers: req.headers.set('Authorization', `Bearer ${token}`)
+    req = req.clone({
+      setHeaders: {
+        Authorization: `Bearer ${token}`
+      }
     });
-    return next(authReq);
   }
 
   return next(req);
-};
+}
+
 
