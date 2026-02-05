@@ -1,0 +1,120 @@
+<div class="management-container">
+  <div class="management-header">
+    <h2>🕯️ Gestión de Difuntos</h2>
+    <button class="btn-new" (click)="openForm()">+ Nuevo Registro</button>
+  </div>
+
+  <div class="search-bar">
+    <input type="text" placeholder="Buscar por nombre, apellido o parcela..." [(ngModel)]="searchTerm" class="search-input" />
+  </div>
+
+  <div class="table-container">
+    <table class="deceased-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre Completo</th>
+          <th>Fechas</th>
+          <th>Edad</th>
+          <th>Cementerio</th>
+          <th>Parcela</th>
+          <th>Responsable</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of filteredDeceased; track item.id) {
+          <tr>
+            <td>{{ item.id }}</td>
+            <td>{{ item.nombre }} {{ item.apellidos }}</td>
+            <td>
+              <small>{{ item.fechaNacimiento | date: 'dd/MM/yyyy' }} - {{ item.fechaFallecimiento | date: 'dd/MM/yyyy' }}</small>
+            </td>
+            <td>{{ getAge(item.fechaNacimiento) }}</td>
+            <td>{{ item.cementerio }}</td>
+            <td class="parcela-badge">{{ item.parcela }}</td>
+            <td>{{ item.responsable }}</td>
+            <td class="actions">
+              <button class="btn-edit" (click)="openForm(item)" title="Editar">✏️</button>
+              <button class="btn-delete" (click)="deleteDeceased(item.id)" title="Eliminar">🗑️</button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    @if (filteredDeceased.length === 0) {
+      <div class="empty-state">
+        <p>No hay registros de difuntos que coincidan con la búsqueda</p>
+      </div>
+    }
+  </div>
+
+  @if (showForm) {
+    <div class="modal-overlay" (click)="closeForm()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>{{ isEditing ? 'Editar Registro' : 'Nuevo Registro de Difunto' }}</h3>
+          <button class="btn-close" (click)="closeForm()">✕</button>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nombre</label>
+            <input type="text" [(ngModel)]="selectedDeceased.nombre" placeholder="Nombre" />
+          </div>
+
+          <div class="form-group">
+            <label>Apellidos</label>
+            <input type="text" [(ngModel)]="selectedDeceased.apellidos" placeholder="Apellidos" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Fecha de Nacimiento</label>
+            <input type="date" [(ngModel)]="selectedDeceased.fechaNacimiento" />
+          </div>
+
+          <div class="form-group">
+            <label>Fecha de Fallecimiento</label>
+            <input type="date" [(ngModel)]="selectedDeceased.fechaFallecimiento" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Cementerio</label>
+            <select [(ngModel)]="selectedDeceased.cementerio">
+              <option>Selecciona un cementerio</option>
+              <option>Cementerio Central</option>
+              <option>Cementerio del Norte</option>
+              <option>Cementerio Privado San José</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Parcela</label>
+            <input type="text" [(ngModel)]="selectedDeceased.parcela" placeholder="A-125" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Responsable</label>
+            <input type="text" [(ngModel)]="selectedDeceased.responsable" placeholder="Nombre del responsable" />
+          </div>
+
+          <div class="form-group">
+            <label>Teléfono Responsable</label>
+            <input type="tel" [(ngModel)]="selectedDeceased.telefono" placeholder="600000000" />
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-cancel" (click)="closeForm()">Cancelar</button>
+          <button class="btn-save" (click)="saveDeceased()">Guardar</button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

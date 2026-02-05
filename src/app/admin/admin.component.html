@@ -1,0 +1,70 @@
+<div class="admin-wrapper">
+  <!-- Sidebar -->
+  <aside class="sidebar" [class.open]="sidebarOpen">
+    <div class="sidebar-header">
+      <div class="logo-section">
+        <div class="logo-icon">✦</div>
+        <div class="logo-text">
+          <h3>AETERNUM</h3>
+          <span>Admin Panel</span>
+        </div>
+      </div>
+      <button class="close-btn" (click)="toggleSidebar()">✕</button>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a routerLink="/admin" routerLinkActive="active" class="nav-item">
+        <span class="nav-label">Dashboard</span>
+      </a>
+      <a routerLink="/admin/users" routerLinkActive="active" class="nav-item">
+        <span class="nav-label">Usuarios</span>
+      </a>
+      <a routerLink="/admin/cemeteries" routerLinkActive="active" class="nav-item">
+        <span class="nav-label">Cementerios</span>
+      </a>
+      <a routerLink="/admin/deceased" routerLinkActive="active" class="nav-item">
+        <span class="nav-label">Difuntos</span>
+      </a>
+      <a routerLink="/admin/reports" routerLinkActive="active" class="nav-item">
+        <span class="nav-label">Reportes</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="avatar">SA</div>
+        <div class="user-details">
+          <p>{{ currentUser }}</p>
+          <span>Super Administrador</span>
+        </div>
+      </div>
+      <button class="logout-btn" (click)="logout()" title="Cerrar sesión">
+        🚪
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="admin-content">
+    <header class="admin-header">
+      <button class="toggle-sidebar" (click)="toggleSidebar()">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <div class="header-title">
+        <h1>Panel de Administración</h1>
+        <p>Bienvenido al sistema de gestión de cementerios</p>
+      </div>
+    </header>
+
+    <div class="content-area">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+
+  @if (sidebarOpen) {
+    <div class="sidebar-overlay" (click)="toggleSidebar()"></div>
+  }
+</div>

@@ -1,0 +1,148 @@
+<div class="reports-container">
+  <div class="reports-header">
+    <div class="header-content">
+      <h2>📬 Reportes y Notificaciones</h2>
+      <span class="unread-badge" *ngIf="getUnreadCount() > 0">{{ getUnreadCount() }} sin leer</span>
+    </div>
+    <div class="header-stats">
+      <div class="stat">
+        <strong>{{ reports.length }}</strong>
+        <span>Total</span>
+      </div>
+      <div class="stat">
+        <strong>{{ getUnreadCount() }}</strong>
+        <span>Sin leer</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="filters">
+    <div class="search-box">
+      <input 
+        type="text" 
+        placeholder="Buscar por nombre, email o asunto..." 
+        [(ngModel)]="searchTerm"
+        class="search-input"
+      />
+    </div>
+    <div class="filter-buttons">
+      <button 
+        [class.active]="filterStatus === 'todos'"
+        (click)="filterStatus = 'todos'"
+        class="filter-btn"
+      >
+        📋 Todos
+      </button>
+      <button 
+        [class.active]="filterStatus === 'no_leido'"
+        (click)="filterStatus = 'no_leido'"
+        class="filter-btn"
+      >
+        🆕 Sin leer
+      </button>
+      <button 
+        [class.active]="filterStatus === 'leido'"
+        (click)="filterStatus = 'leido'"
+        class="filter-btn"
+      >
+        ✓ Leidos
+      </button>
+    </div>
+  </div>
+
+  <div class="reports-layout">
+    <!-- Lista de reportes -->
+    <div class="reports-list">
+      @if (filteredReports.length === 0) {
+        <div class="empty-state">
+          <p>📭 No hay reportes</p>
+        </div>
+      } @else {
+        @for (report of filteredReports; track report.id) {
+          <div 
+            class="report-item"
+            [class.unread]="report.estado === 'no_leido'"
+            (click)="openReport(report)"
+          >
+            <div class="report-status">
+              @if (report.estado === 'no_leido') {
+                <span class="status-indicator">●</span>
+              }
+            </div>
+            <div class="report-content">
+              <div class="report-header">
+                <h4>{{ report.nombre }}</h4>
+                <span class="type-badge" [class]="report.tipo">
+                  {{ getTypeLabel(report.tipo) }}
+                </span>
+              </div>
+              <p class="report-subject">{{ report.asunto }}</p>
+              <small class="report-date">{{ report.fecha | date: 'dd/MM/yyyy HH:mm' }}</small>
+            </div>
+          </div>
+        }
+      }
+    </div>
+
+    <!-- Detalle del reporte -->
+    @if (selectedReport) {
+      <div class="report-detail">
+        <div class="detail-header">
+          <h3>Detalles del Reporte</h3>
+          <button class="btn-close" (click)="closeReport()">✕</button>
+        </div>
+
+        <div class="detail-content">
+          <div class="detail-group">
+            <label>De:</label>
+            <p>{{ selectedReport.nombre }} ({{ selectedReport.email }})</p>
+          </div>
+
+          <div class="detail-group">
+            <label>Teléfono:</label>
+            <p>{{ selectedReport.telefono }}</p>
+          </div>
+
+          <div class="detail-group">
+            <label>Tipo:</label>
+            <span class="type-badge" [class]="selectedReport.tipo">
+              {{ getTypeLabel(selectedReport.tipo) }}
+            </span>
+          </div>
+
+          <div class="detail-group">
+            <label>Asunto:</label>
+            <p>{{ selectedReport.asunto }}</p>
+          </div>
+
+          <div class="detail-group full">
+            <label>Mensaje:</label>
+            <div class="message-box">
+              {{ selectedReport.mensaje }}
+            </div>
+          </div>
+
+          <div class="detail-group">
+            <label>Fecha:</label>
+            <p>{{ selectedReport.fecha | date: 'dd/MM/yyyy HH:mm' }}</p>
+          </div>
+
+          <div class="detail-actions">
+            @if (selectedReport.estado === 'no_leido') {
+              <button class="btn-action" (click)="markAsRead(selectedReport.id)">
+                ✓ Marcar como leído
+              </button>
+            } @else {
+              <button class="btn-action" (click)="markAsUnread(selectedReport.id)">
+                ↻ Marcar como no leído
+              </button>
+            }
+            <button class="btn-delete" (click)="deleteReport(selectedReport.id)">
+              🗑️ Eliminar
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</div>

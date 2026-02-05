@@ -44,6 +44,11 @@ export class AuthService {
     return roles.includes(role);
   }
 
+  getUserRole(): string {
+    const roles = JSON.parse(localStorage.getItem('roles') || '[]');
+    return roles.length > 0 ? roles[0] : '';
+  }
+
   logout(): void {
     localStorage.clear();
   }

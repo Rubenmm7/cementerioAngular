@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
@@ -13,7 +13,7 @@ import { LoginRequest } from '../../models/login-request';
   templateUrl: './login.html',
   styleUrl: './login.css'
 })
-export class Login {
+export class Login implements OnInit {
 
   loginForm: FormGroup;
   error = '';
@@ -30,6 +30,13 @@ export class Login {
     });
   }
 
+  ngOnInit(): void {
+    // Si ya está logueado, redirigir al inicio
+    if (this.authService.isLoggedIn()) {
+      this.router.navigate(['/']);
+    }
+  }
+
   login(): void {
     if (this.loginForm.invalid) {
       return;
@@ -43,8 +50,16 @@ export class Login {
     this.authService.login(this.loginForm.value).subscribe({
       next: res => {
         this.authService.saveToken(res.token);
+        // Guardar datos del usuario si existen en la respuesta
+        if (res.usuario) {
+          localStorage.setItem('userData', JSON.stringify(res.usuario));
+        }
+        // Guardar roles si existen en la respuesta
+        if (res.roles) {
+          localStorage.setItem('roles', JSON.stringify(res.roles));
+        }
         this.isLoading = false;
-        this.router.navigate(['/admin']);
+        this.router.navigate(['/']);
       },
       error: () => {
         this.isLoading = false;

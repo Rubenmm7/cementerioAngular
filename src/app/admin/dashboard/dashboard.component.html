@@ -1,0 +1,32 @@
+<div class="dashboard-container">
+  <div class="dashboard-header">
+    <h1>Panel de Administración</h1>
+    <p>Bienvenido al sistema de gestión de cementerios</p>
+  </div>
+
+  <section class="stats-grid">
+    @for (stat of stats; track stat.label) {
+      <div class="stat-card">
+        <div class="stat-info">
+          <h3>{{ stat.label }}</h3>
+          <p class="stat-value">{{ stat.value }}</p>
+        </div>
+      </div>
+    }
+  </section>
+
+  <section class="recent-activity">
+    <h2>Actividad Reciente</h2>
+    <div class="activity-list">
+      @for (activity of activities; track activity.title) {
+        <div class="activity-item">
+          <div class="activity-content">
+            <p><strong>{{ activity.title }}</strong></p>
+            <span>{{ activity.description }}</span>
+          </div>
+          <time>{{ activity.time }}</time>
+        </div>
+      }
+    </div>
+  </section>
+</div>

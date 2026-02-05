@@ -12,8 +12,22 @@
       <li><a href="#contacto" class="menu-link">Contacto</a></li>
     </ul>
 
-    <button routerLink="/login" class="login-btn">
-      Acceder
-    </button>
+    <div class="navbar-actions">
+      @if (isAdmin) {
+        <button class="admin-btn" (click)="goToAdmin()">
+          Panel de Administrador
+        </button>
+      }
+      
+      @if (!isLoggedIn) {
+        <button routerLink="/login" class="login-btn">
+          Acceder
+        </button>
+      } @else {
+        <button class="logout-btn" (click)="logout()">
+          Cerrar Sesión
+        </button>
+      }
+    </div>
   </div>
 </nav>
