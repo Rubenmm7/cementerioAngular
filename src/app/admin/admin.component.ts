@@ -1,58 +1,93 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { CementerioService } from '../services/cementerio-service';
 import { AuthService } from '../auth/auth';
-import {Cementerio } from '../models/cementerio.model';
+import { Cementerio } from '../models/cementerio.model';
 import { Ayuntamiento } from '../models/ayuntamiento.model';
-
+import { Router } from '@angular/router';
+import { CementerioService } from '../services/cementerio-service';
 
 @Component({
   selector: 'app-admin',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './admin.component.html', // Tu HTML original
-  styleUrl: './admin.component.css'      // Tu CSS original
+  templateUrl: './admin.component.html',
+  styleUrls: ['./admin.component.css']
 })
 export class AdminComponent implements OnInit {
 
-  // Variables para tus datos
-  ayuntamientos: Ayuntamiento[] = [];
+  // Estado de la interfaz
+  sidebarOpen = false;
+  activeTab = 'dashboard'; // Pestaña inicial
+  currentUser = 'Admin';   // Nombre del usuario logueado
+
+  // Datos del Backend
   cementerios: Cementerio[] = [];
-  seccionActiva: string = 'dashboard'; // Valores: 'dashboard', 'ayuntamientos', 'cementerios', 'usuarios'
+  ayuntamientos: Ayuntamiento[] = [];
+  
+  // Estadísticas
+  stats = {
+    totalAyuntamientos: 0,
+    totalCementerios: 0,
+    usuariosActivos: 3, // Dato simulado
+    difuntosRegistrados: 150 // Dato simulado
+  };
 
   constructor(
     private cementerioService: CementerioService,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
     this.cargarDatos();
+    // Recuperar nombre del usuario si está en el token/localStorage
+    const tokenUser = localStorage.getItem('username'); // Opcional si lo guardaste
+    if (tokenUser) this.currentUser = tokenUser;
   }
 
   cargarDatos(): void {
-    // Cargar Cementerios desde el backend
+    // 1. Cargar Cementerios desde Spring Boot
     this.cementerioService.getCementerios().subscribe({
       next: (data) => {
         this.cementerios = data;
-        
-        // Extraer Ayuntamientos únicos de los cementerios (truco para no hacer otra petición)
-        const map = new Map();
+        this.stats.totalCementerios = data.length;
+
+        // 2. Extraer Ayuntamientos únicos de los cementerios
+        const mapaAytos = new Map();
         data.forEach(c => {
-          if(c.ayuntamiento) map.set(c.ayuntamiento.id, c.ayuntamiento);
+          if (c.ayuntamiento) mapaAytos.set(c.ayuntamiento.id, c.ayuntamiento);
         });
-        this.ayuntamientos = Array.from(map.values());
+        this.ayuntamientos = Array.from(mapaAytos.values());
+        this.stats.totalAyuntamientos = this.ayuntamientos.length;
       },
-      error: (e) => console.error('Error al cargar datos:', e)
+      error: (err) => console.error('Error conectando con el backend:', err)
     });
   }
 
-  // Método para cambiar de sección (conectar a tus botones del menú)
-  cambiarSeccion(seccion: string): void {
-    this.seccionActiva = seccion;
+  toggleSidebar(): void {
+    this.sidebarOpen = !this.sidebarOpen;
+  }
+
+  cambiarPestana(tab: string): void {
+    this.activeTab = tab;
+    // En móviles, cerrar sidebar al elegir opción
+    if (window.innerWidth <= 768) {
+      this.sidebarOpen = false;
+    }
   }
 
   logout(): void {
     this.authService.logout();
-    window.location.href = '/login';
+    this.router.navigate(['/login']);
+  }
+
+  // --- CRUD (Ejemplos) ---
+
+  borrarCementerio(id: number): void {
+    if(confirm('¿Seguro que deseas eliminar este cementerio?')) {
+      // Simulación visual (aquí iría la llamada real al backend)
+      this.cementerios = this.cementerios.filter(c => c.id !== id);
+      this.stats.totalCementerios--;
+    }
   }
 }

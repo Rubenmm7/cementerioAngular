@@ -24,4 +24,5 @@ export class CementerioService {
   getParcelasPorZona(id: number): Observable<Parcela[]> {
     return this.http.get<Parcela[]>(`${this.apiUrl}/parcelas/zona/${id}`);
   }
+  
 }

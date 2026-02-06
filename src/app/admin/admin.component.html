@@ -1,137 +1,163 @@
-<div class="d-flex" id="wrapper">
-    <div class="bg-dark text-white border-end" style="min-width: 250px; min-height: 100vh;">
-        <div class="sidebar-heading p-3 border-bottom fs-4 fw-bold">⚙️ Aeternum Admin</div>
-        <div class="list-group list-group-flush">
-            <button class="list-group-item list-group-item-action list-group-item-dark p-3" 
-                    [class.active]="activeTab === 'dashboard'" (click)="cambiarPestana('dashboard')">
-                📊 Dashboard
-            </button>
-            <button class="list-group-item list-group-item-action list-group-item-dark p-3" 
-                    [class.active]="activeTab === 'ayuntamientos'" (click)="cambiarPestana('ayuntamientos')">
-                🏛️ Ayuntamientos
-            </button>
-            <button class="list-group-item list-group-item-action list-group-item-dark p-3" 
-                    [class.active]="activeTab === 'cementerios'" (click)="cambiarPestana('cementerios')">
-                ⚰️ Cementerios
-            </button>
-            <button class="list-group-item list-group-item-action list-group-item-dark p-3" 
-                    [class.active]="activeTab === 'usuarios'" (click)="cambiarPestana('usuarios')">
-                👥 Usuarios
-            </button>
-            
-            <div class="mt-auto p-3">
-                <button class="btn btn-danger w-100" (click)="logout()">Cerrar Sesión</button>
-            </div>
+<div class="admin-wrapper">
+  
+  <aside class="sidebar" [class.open]="sidebarOpen">
+    <div class="sidebar-header">
+      <div class="logo-section">
+        <div class="logo-icon">✦</div>
+        <div class="logo-text">
+          <h3>AETERNUM</h3>
+          <span>Admin Panel</span>
         </div>
+      </div>
+      <button class="close-btn" (click)="toggleSidebar()">✕</button>
     </div>
 
-    <div id="page-content-wrapper" class="w-100 bg-light">
-        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom px-4">
-            <h2 class="my-2">Panel de Control</h2>
-        </nav>
+    <nav class="sidebar-nav">
+      <a (click)="cambiarPestana('dashboard')" [class.active]="activeTab === 'dashboard'" class="nav-item">
+        <span class="nav-label">Dashboard</span>
+      </a>
+      <a (click)="cambiarPestana('ayuntamientos')" [class.active]="activeTab === 'ayuntamientos'" class="nav-item">
+        <span class="nav-label">Ayuntamientos</span>
+      </a>
+      <a (click)="cambiarPestana('cementerios')" [class.active]="activeTab === 'cementerios'" class="nav-item">
+        <span class="nav-label">Cementerios</span>
+      </a>
+      <a (click)="cambiarPestana('usuarios')" [class.active]="activeTab === 'usuarios'" class="nav-item">
+        <span class="nav-label">Usuarios</span>
+      </a>
+      <a (click)="cambiarPestana('difuntos')" [class.active]="activeTab === 'difuntos'" class="nav-item">
+        <span class="nav-label">Difuntos</span>
+      </a>
+    </nav>
 
-        <div class="container-fluid p-4">
-            
-            <div *ngIf="activeTab === 'dashboard'">
-                <div class="row g-4">
-                    <div class="col-md-4">
-                        <div class="card shadow-sm border-primary">
-                            <div class="card-body">
-                                <h5 class="card-title text-primary">Ayuntamientos</h5>
-                                <p class="display-4">{{ stats.totalAyuntamientos }}</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card shadow-sm border-success">
-                            <div class="card-body">
-                                <h5 class="card-title text-success">Cementerios</h5>
-                                <p class="display-4">{{ stats.totalCementerios }}</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card shadow-sm border-warning">
-                            <div class="card-body">
-                                <h5 class="card-title text-warning">Usuarios Activos</h5>
-                                <p class="display-4">{{ stats.usuariosActivos }}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div *ngIf="activeTab === 'ayuntamientos'">
-                <div class="d-flex justify-content-between mb-3">
-                    <h3>Gestión de Ayuntamientos</h3>
-                    <button class="btn btn-primary">+ Nuevo Ayuntamiento</button>
-                </div>
-                <div class="card shadow-sm">
-                    <table class="table table-hover mb-0">
-                        <thead class="table-dark">
-                            <tr>
-                                <th>ID</th>
-                                <th>Nombre</th>
-                                <th>Teléfono</th>
-                                <th>Dirección</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr *ngFor="let ayto of ayuntamientos">
-                                <td>{{ ayto.id }}</td>
-                                <td>{{ ayto.nombre }}</td>
-                                <td>{{ ayto.telefono }}</td>
-                                <td>{{ ayto.direccion }}</td>
-                                <td>
-                                    <button class="btn btn-sm btn-outline-primary me-2" (click)="editarAyuntamiento(ayto)">Editar</button>
-                                    <button class="btn btn-sm btn-outline-danger">Borrar</button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div *ngIf="activeTab === 'cementerios'">
-                <div class="d-flex justify-content-between mb-3">
-                    <h3>Gestión de Cementerios</h3>
-                    <button class="btn btn-primary">+ Nuevo Cementerio</button>
-                </div>
-                <div class="card shadow-sm">
-                    <table class="table table-hover mb-0">
-                        <thead class="table-dark">
-                            <tr>
-                                <th>ID</th>
-                                <th>Nombre</th>
-                                <th>Población</th>
-                                <th>Ayuntamiento</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr *ngFor="let cem of cementerios">
-                                <td>{{ cem.id }}</td>
-                                <td>{{ cem.nombre }}</td>
-                                <td>{{ cem.poblacion }}</td>
-                                <td>{{ cem.ayuntamiento?.nombre || 'N/A' }}</td>
-                                <td>
-                                    <button class="btn btn-sm btn-outline-primary me-2">Editar</button>
-                                    <button class="btn btn-sm btn-outline-danger" (click)="eliminarCementerio(cem.id)">Borrar</button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div *ngIf="activeTab === 'usuarios'">
-                <div class="alert alert-info">
-                    Aquí iría la tabla de usuarios (Admin, Operarios, Clientes). 
-                    Implementar similar a las anteriores conectando con UserService.
-                </div>
-            </div>
-
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="avatar">SA</div>
+        <div class="user-details">
+          <p>{{ currentUser }}</p>
+          <span>Super Administrador</span>
         </div>
+      </div>
+      <button class="logout-btn" (click)="logout()" title="Cerrar sesión">
+        🚪
+      </button>
     </div>
+  </aside>
+
+  <div class="sidebar-overlay" [class.show]="sidebarOpen" (click)="toggleSidebar()"></div>
+
+  <main class="admin-content">
+    <header class="admin-header">
+      <button class="toggle-sidebar" (click)="toggleSidebar()">
+        <span>☰</span>
+      </button>
+
+      <div class="header-title">
+        <h1>Panel de Administración</h1>
+        <p *ngIf="activeTab === 'dashboard'">Vista general del sistema</p>
+        <p *ngIf="activeTab === 'cementerios'">Gestión de camposantos</p>
+        <p *ngIf="activeTab === 'ayuntamientos'">Entidades gestoras</p>
+      </div>
+    </header>
+
+    <div class="content-area">
+      
+      @if (activeTab === 'dashboard') {
+        <div class="dashboard-grid">
+          <div class="card stats-card">
+            <h3>{{ stats.totalAyuntamientos }}</h3>
+            <p>Ayuntamientos</p>
+          </div>
+          <div class="card stats-card">
+            <h3>{{ stats.totalCementerios }}</h3>
+            <p>Cementerios</p>
+          </div>
+          <div class="card stats-card">
+            <h3>{{ stats.usuariosActivos }}</h3>
+            <p>Usuarios Activos</p>
+          </div>
+          <div class="card stats-card">
+            <h3>{{ stats.difuntosRegistrados }}</h3>
+            <p>Difuntos</p>
+          </div>
+        </div>
+      }
+
+      @if (activeTab === 'ayuntamientos') {
+        <div class="table-container card">
+          <div class="card-header d-flex justify-content-between">
+            <h3>Listado de Ayuntamientos</h3>
+            <button class="btn-primary">+ Crear</button>
+          </div>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Dirección</th>
+                <th>Teléfono</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (ayto of ayuntamientos; track ayto.id) {
+                <tr>
+                  <td>{{ ayto.nombre }}</td>
+                  <td>{{ ayto.direccion }}</td>
+                  <td>{{ ayto.telefono }}</td>
+                  <td>
+                    <button class="action-btn edit">✏️</button>
+                    <button class="action-btn delete">🗑️</button>
+                  </td>
+                </tr>
+              } @empty {
+                <tr><td colspan="4">No hay datos.</td></tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+
+      @if (activeTab === 'cementerios') {
+        <div class="table-container card">
+          <div class="card-header d-flex justify-content-between">
+            <h3>Listado de Cementerios</h3>
+            <button class="btn-primary">+ Crear</button>
+          </div>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Población</th>
+                <th>Ayuntamiento</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (cem of cementerios; track cem.id) {
+                <tr>
+                  <td>{{ cem.nombre }}</td>
+                  <td>{{ cem.poblacion }}</td>
+                  <td>{{ cem.ayuntamiento?.nombre }}</td>
+                  <td>
+                    <button class="action-btn edit">✏️</button>
+                    <button class="action-btn delete" (click)="borrarCementerio(cem.id)">🗑️</button>
+                  </td>
+                </tr>
+              } @empty {
+                <tr><td colspan="4">No hay datos.</td></tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+
+      @if (activeTab === 'usuarios' || activeTab === 'difuntos' || activeTab === 'reports') {
+        <div class="empty-state">
+          <h3>🚧 Sección en Construcción</h3>
+          <p>Próximamente disponible</p>
+        </div>
+      }
+
+    </div>
+  </main>
 </div>
