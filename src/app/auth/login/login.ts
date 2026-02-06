@@ -49,7 +49,7 @@ export class Login implements OnInit {
 
     this.authService.login(this.loginForm.value).subscribe({
       next: res => {
-        this.authService.saveToken(res.token);
+        this.authService.saveSession(res);
         // Guardar datos del usuario si existen en la respuesta
         if (res.usuario) {
           localStorage.setItem('userData', JSON.stringify(res.usuario));
