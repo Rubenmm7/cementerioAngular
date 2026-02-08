@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ReportService } from '../../services/report-service';
+
+
 
 interface Report {
   id?: number;
@@ -27,53 +30,23 @@ export class ReportsComponent implements OnInit {
   filterStatus = 'todos'; // todos, no_leido, leido
   searchTerm = '';
 
+  constructor(private reportService: ReportService) {}
+
   ngOnInit(): void {
     this.loadReports();
   }
 
   loadReports(): void {
-    // Datos de ejemplo - conectaremos con API más tarde
-    this.reports = [
-      {
-        id: 1,
-        fecha: '2024-02-04',
-        nombre: 'Juan García',
-        email: 'juan@example.com',
-        asunto: 'Consulta sobre servicios',
-        mensaje: 'Me gustaría conocer más sobre los servicios disponibles para futuros servicios.',
-        telefono: '600123456',
-        estado: 'no_leido',
-        tipo: 'consulta'
-      },
-      {
-        id: 2,
-        fecha: '2024-02-03',
-        nombre: 'María López',
-        email: 'maria@example.com',
-        asunto: 'Sugerencia de mejora',
-        mensaje: 'Sería genial si pudieran implementar un sistema de reserva de parcelas en línea.',
-        telefono: '600234567',
-        estado: 'leido',
-        tipo: 'sugerencia'
-      },
-      {
-        id: 3,
-        fecha: '2024-02-02',
-        nombre: 'Carlos Martínez',
-        email: 'carlos@example.com',
-        asunto: 'Problema con trámite',
-        mensaje: 'He tenido dificultades para completar mi solicitud. Necesito ayuda.',
-        telefono: '600345678',
-        estado: 'no_leido',
-        tipo: 'queja'
-      }
-    ];
+    this.reportService.getReports().subscribe({
+      next: (data: any[]) => this.reports = data,
+      error: (err) => console.error('Error cargando reportes:', err)
+    });
   }
 
   openReport(report: Report): void {
     this.selectedReport = report;
     if (report.estado === 'no_leido') {
-      report.estado = 'leido';
+      this.markAsRead(report.id);
     }
   }
 
@@ -83,8 +56,13 @@ export class ReportsComponent implements OnInit {
 
   deleteReport(id?: number): void {
     if (id && confirm('¿Estás seguro de que deseas eliminar este reporte?')) {
-      this.reports = this.reports.filter(r => r.id !== id);
-      this.closeReport();
+      this.reportService.deleteReport(id).subscribe({
+        next: () => {
+          this.reports = this.reports.filter(r => r.id !== id);
+          this.closeReport();
+        },
+        error: (err) => console.error('Error eliminando reporte:', err)
+      });
     }
   }
 
@@ -92,6 +70,9 @@ export class ReportsComponent implements OnInit {
     const report = this.reports.find(r => r.id === id);
     if (report) {
       report.estado = 'no_leido';
+      this.reportService.updateReport(id!, report).subscribe({
+        error: (err) => console.error('Error actualizando reporte:', err)
+      });
     }
   }
 
@@ -99,6 +80,9 @@ export class ReportsComponent implements OnInit {
     const report = this.reports.find(r => r.id === id);
     if (report) {
       report.estado = 'leido';
+      this.reportService.updateReport(id!, report).subscribe({
+        error: (err) => console.error('Error actualizando reporte:', err)
+      });
     }
   }
 

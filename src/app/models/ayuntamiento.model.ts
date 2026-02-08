@@ -5,5 +5,6 @@ export interface Ayuntamiento {
     nombre: string;
     telefono: string;
     direccion: string;
+    email: string;
     cementerios?: Cementerio[]; 
 }

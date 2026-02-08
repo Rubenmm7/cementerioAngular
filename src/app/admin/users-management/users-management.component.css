@@ -132,6 +132,16 @@
   color: #e6962a;
 }
 
+.role-badge.operator {
+  background: rgba(60, 130, 220, 0.2);
+  color: #3c82dc;
+}
+
+.role-badge.cliente {
+  background: rgba(82, 183, 136, 0.2);
+  color: #52B788;
+}
+
 .status-badge {
   background: rgba(100, 150, 100, 0.2);
   color: #90bb90;

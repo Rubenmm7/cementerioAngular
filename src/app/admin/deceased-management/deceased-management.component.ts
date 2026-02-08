@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { DifuntoService } from '../../services/difunto-service';
 
 interface Deceased {
   id?: number;
@@ -20,12 +21,16 @@ interface Deceased {
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './deceased-management.component.html',
-  styleUrl: './deceased-management.component.css'
+  styleUrls: ['../management-styles.css']
 })
+
 export class DeceasedManagementComponent implements OnInit {
   deceased: Deceased[] = [];
   showForm = false;
   isEditing = false;
+
+  @Output() deceasedChange = new EventEmitter<void>();
+
   selectedDeceased: Deceased = {
     nombre: '',
     apellidos: '',
@@ -39,37 +44,23 @@ export class DeceasedManagementComponent implements OnInit {
   };
   searchTerm = '';
 
+  constructor(
+    private difuntoService: DifuntoService,
+    private cdr: ChangeDetectorRef
+    ) { }
+
   ngOnInit(): void {
     this.loadDeceased();
   }
 
   loadDeceased(): void {
-    this.deceased = [
-      {
-        id: 1,
-        nombre: 'José',
-        apellidos: 'García López',
-        fechaNacimiento: '1945-03-15',
-        fechaFallecimiento: '2023-11-20',
-        cementerio: 'Cementerio Central',
-        parcela: 'A-125',
-        responsable: 'Juan García',
-        telefono: '600123456',
-        estado: 'activo'
+    this.difuntoService.getDifuntos().subscribe({
+      next: (data) => {
+        this.deceased = data;
+        this.cdr.detectChanges();
       },
-      {
-        id: 2,
-        nombre: 'María',
-        apellidos: 'Rodríguez García',
-        fechaNacimiento: '1950-07-22',
-        fechaFallecimiento: '2024-02-10',
-        cementerio: 'Cementerio del Norte',
-        parcela: 'B-87',
-        responsable: 'Carlos Rodríguez',
-        telefono: '600234567',
-        estado: 'activo'
-      }
-    ];
+      error: (e) => console.error(e)
+    });
   }
 
   openForm(item?: Deceased): void {
@@ -98,21 +89,29 @@ export class DeceasedManagementComponent implements OnInit {
   }
 
   saveDeceased(): void {
-    if (this.isEditing && this.selectedDeceased.id) {
-      const index = this.deceased.findIndex(d => d.id === this.selectedDeceased.id);
-      if (index > -1) {
-        this.deceased[index] = { ...this.selectedDeceased };
-      }
-    } else {
-      this.selectedDeceased.id = Math.max(...this.deceased.map(d => d.id || 0)) + 1;
-      this.deceased.push({ ...this.selectedDeceased });
-    }
-    this.closeForm();
+    const operation = this.isEditing && this.selectedDeceased.id
+      ? this.difuntoService.updateDifunto(this.selectedDeceased.id, this.selectedDeceased)
+      : this.difuntoService.createDifunto(this.selectedDeceased);
+
+    operation.subscribe({
+      next: () => {
+        this.loadDeceased();
+        this.deceasedChange.emit();
+        this.closeForm();
+      },
+      error: (err) => console.error("Error guardando difunto:", err)
+    });
   }
 
   deleteDeceased(id?: number): void {
-    if (id && confirm('¿Estás seguro de que deseas eliminar este registro?')) {
-      this.deceased = this.deceased.filter(d => d.id !== id);
+    if (id && confirm('¿Eliminar registro?')) {
+      this.difuntoService.deleteDifunto(id).subscribe({
+        next: () => {
+          this.loadDeceased();
+          this.deceasedChange.emit();
+        },
+        error: (err) => console.error("Error eliminando difunto:", err)
+      });
     }
   }
 
@@ -129,9 +128,9 @@ export class DeceasedManagementComponent implements OnInit {
 
   get filteredDeceased(): Deceased[] {
     return this.deceased.filter(d =>
-      (d.nombre.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-       d.apellidos.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-       d.parcela.toLowerCase().includes(this.searchTerm.toLowerCase()))
+    (d.nombre.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+      d.apellidos.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+      d.parcela.toLowerCase().includes(this.searchTerm.toLowerCase()))
     );
   }
 }

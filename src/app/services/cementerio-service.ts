@@ -9,20 +9,35 @@ import { Parcela } from '../models/parcela.model';
   providedIn: 'root'
 })
 export class CementerioService {
-  private apiUrl = 'http://localhost:8080/api'; 
+  private apiUrl = 'http://localhost:8080/api/cementerios';
 
   constructor(private http: HttpClient) { }
 
+  // Obtener todos
   getCementerios(): Observable<Cementerio[]> {
-    return this.http.get<Cementerio[]>(`${this.apiUrl}/cementerios`);
+    return this.http.get<Cementerio[]>(this.apiUrl);
+  }
+
+  // Crear uno nuevo
+  createCementerio(cementerio: Cementerio): Observable<Cementerio> {
+    return this.http.post<Cementerio>(this.apiUrl, cementerio);
+  }
+
+  // Actualizar existente
+  updateCementerio(id: number, cementerio: Cementerio): Observable<Cementerio> {
+    return this.http.put<Cementerio>(`${this.apiUrl}/${id}`, cementerio);
+  }
+
+  // Eliminar
+  deleteCementerio(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 
   getZonasPorCementerio(id: number): Observable<Zona[]> {
-    return this.http.get<Zona[]>(`${this.apiUrl}/zonas/cementerio/${id}`);
+    return this.http.get<Zona[]>(`http://localhost:8080/api/zonas/cementerio/${id}`);
   }
 
   getParcelasPorZona(id: number): Observable<Parcela[]> {
-    return this.http.get<Parcela[]>(`${this.apiUrl}/parcelas/zona/${id}`);
+    return this.http.get<Parcela[]>(`http://localhost:8080/api/parcelas/zona/${id}`);
   }
-  
 }

@@ -1,6 +1,6 @@
 <div class="management-container">
   <div class="management-header">
-    <h2>🕯️ Gestión de Difuntos</h2>
+    <h2>Gestión de Difuntos</h2>
     <button class="btn-new" (click)="openForm()">+ Nuevo Registro</button>
   </div>
 
@@ -9,7 +9,7 @@
   </div>
 
   <div class="table-container">
-    <table class="deceased-table">
+    <table class="management-table">
       <thead>
         <tr>
           <th>ID</th>
@@ -32,7 +32,7 @@
             </td>
             <td>{{ getAge(item.fechaNacimiento) }}</td>
             <td>{{ item.cementerio }}</td>
-            <td class="parcela-badge">{{ item.parcela }}</td>
+            <td><span class="data-badge">{{ item.parcela }}</span></td>
             <td>{{ item.responsable }}</td>
             <td class="actions">
               <button class="btn-edit" (click)="openForm(item)" title="Editar">✏️</button>

@@ -1,61 +1,81 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
-interface User {
-  id?: number;
-  nombre: string;
-  email: string;
-  telefono: string;
-  rol: string;
-  estado: 'activo' | 'inactivo';
-}
+import { UserService } from '../../services/user-service';
+import { UserResponseDTO } from '../../models/user-response-dto';
+import { AyuntamientoService } from '../../services/ayuntamiento-service';
+import { Ayuntamiento } from '../../models/ayuntamiento.model';
 
 @Component({
   selector: 'app-users-management',
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './users-management.component.html',
-  styleUrl: './users-management.component.css'
+  styleUrls: ['../management-styles.css']
 })
 export class UsersManagementComponent implements OnInit {
-  users: User[] = [];
+  users: UserResponseDTO[] = [];
+  ayuntamientos: Ayuntamiento[] = [];
+
   showForm = false;
   isEditing = false;
-  selectedUser: User = {
+  searchTerm = '';
+
+  @Output() userChange = new EventEmitter<void>();
+
+  selectedUser: any = {
     nombre: '',
+    apellidos: '',
     email: '',
     telefono: '',
-    rol: 'USER',
-    estado: 'activo'
+    role: 'CLIENTE',
+    ayuntamiento: null
   };
-  searchTerm = '';
+
+  constructor(
+    private userService: UserService,
+    private cdr: ChangeDetectorRef,
+    private ayuntamientoService: AyuntamientoService
+  ) { }
 
   ngOnInit(): void {
     this.loadUsers();
+    this.loadAyuntamientos();
   }
 
   loadUsers(): void {
-    // Datos de ejemplo - luego conectaremos con la API
-    this.users = [
-      { id: 1, nombre: 'Juan García', email: 'juan@example.com', telefono: '600123456', rol: 'USER', estado: 'activo' },
-      { id: 2, nombre: 'María López', email: 'maria@example.com', telefono: '600234567', rol: 'USER', estado: 'activo' },
-      { id: 3, nombre: 'Carlos Martínez', email: 'carlos@example.com', telefono: '600345678', rol: 'ADMIN', estado: 'activo' }
-    ];
+    this.userService.getUsers().subscribe({
+      next: (data) => {
+        this.users = data;
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error('Error cargando usuarios:', err)
+    });
   }
 
-  openForm(user?: User): void {
+  loadAyuntamientos(): void {
+    this.ayuntamientoService.getAyuntamientos().subscribe({
+      next: (data) => {
+        this.ayuntamientos = data;
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error('Error cargando ayuntamientos:', err)
+    });
+  }
+
+  openForm(user?: UserResponseDTO): void {
     if (user) {
       this.isEditing = true;
-      this.selectedUser = { ...user };
+      this.selectedUser = { ...user, ayuntamiento: user.ayuntamiento ? user.ayuntamiento.id : null };
     } else {
       this.isEditing = false;
       this.selectedUser = {
         nombre: '',
+        apellidos: '',
         email: '',
         telefono: '',
-        rol: 'USER',
-        estado: 'activo'
+        role: 'CLIENTE',
+        ayuntamiento: null
       };
     }
     this.showForm = true;
@@ -66,32 +86,46 @@ export class UsersManagementComponent implements OnInit {
   }
 
   saveUser(): void {
-    if (this.isEditing && this.selectedUser.id) {
-      const index = this.users.findIndex(u => u.id === this.selectedUser.id);
-      if (index > -1) {
-        this.users[index] = { ...this.selectedUser };
-      }
+    const payload = {
+      ...this.selectedUser,
+      ayuntamiento: this.selectedUser.ayuntamiento ? { id: this.selectedUser.ayuntamiento } : null
+    };
+
+    if (this.isEditing && payload.id) {
+      this.userService.updateUser(payload.id, payload).subscribe({
+        next: () => {
+          this.loadUsers();
+          this.userChange.emit();
+          this.closeForm();
+        }
+      });
     } else {
-      this.selectedUser.id = Math.max(...this.users.map(u => u.id || 0)) + 1;
-      this.users.push({ ...this.selectedUser });
+      this.userService.createUser(payload).subscribe({
+        next: () => {
+          this.loadUsers();
+          this.userChange.emit();
+          this.closeForm();
+        }
+      });
     }
-    this.closeForm();
   }
 
   deleteUser(id?: number): void {
-    if (id && confirm('¿Estás seguro de que deseas eliminar este usuario?')) {
-      this.users = this.users.filter(u => u.id !== id);
+    if (id && confirm('¿Eliminar usuario?')) {
+      this.userService.deleteUser(id).subscribe({
+        next: () => {
+          this.loadUsers();
+          this.userChange.emit();
+        }
+      });
     }
   }
 
-  toggleUserStatus(user: User): void {
-    user.estado = user.estado === 'activo' ? 'inactivo' : 'activo';
-  }
-
-  get filteredUsers(): User[] {
+  get filteredUsers(): UserResponseDTO[] {
+    const searchTerm = this.searchTerm.toLowerCase();
     return this.users.filter(u =>
-      u.nombre.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-      u.email.toLowerCase().includes(this.searchTerm.toLowerCase())
+      (u.nombre && u.nombre.toLowerCase().includes(searchTerm)) ||
+      (u.email && u.email.toLowerCase().includes(searchTerm))
     );
   }
 }

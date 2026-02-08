@@ -37,6 +37,7 @@
   box-shadow: 0 6px 20px rgba(82, 183, 136, 0.3);
 }
 
+/* Search Bar */
 .search-bar {
   margin-bottom: 25px;
 }
@@ -64,6 +65,7 @@
   color: rgba(232, 245, 233, 0.5);
 }
 
+/* Table */
 .table-container {
   background: rgba(15, 25, 20, 0.6);
   border: 1px solid rgba(82, 183, 136, 0.2);
@@ -73,20 +75,20 @@
   overflow-y: auto;
 }
 
-.cemeteries-table {
+.management-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 14px;
 }
 
-.cemeteries-table thead {
+.management-table thead {
   background: linear-gradient(135deg, rgba(82, 183, 136, 0.15) 0%, rgba(64, 145, 108, 0.1) 100%);
   position: sticky;
   top: 0;
   z-index: 10;
 }
 
-.cemeteries-table th {
+.management-table th {
   padding: 15px;
   text-align: left;
   color: #52B788;
@@ -94,50 +96,24 @@
   border-bottom: 2px solid rgba(82, 183, 136, 0.2);
 }
 
-.cemeteries-table td {
+.management-table td {
   padding: 15px;
   border-bottom: 1px solid rgba(82, 183, 136, 0.1);
   color: #b0d4b1;
 }
 
-.cemeteries-table tbody tr {
+.management-table tbody tr {
   transition: background 0.3s ease;
 }
 
-.cemeteries-table tbody tr:hover {
+.management-table tbody tr:hover {
   background: rgba(82, 183, 136, 0.08);
 }
 
-.occupancy-bar {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  position: relative;
-  height: 24px;
-  background: rgba(82, 183, 136, 0.1);
-  border-radius: 4px;
-  overflow: hidden;
-  min-width: 120px;
-}
-
-.occupancy-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #52B788, #40916C);
-  transition: width 0.3s ease;
-}
-
-.occupancy-text {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 12px;
-  font-weight: 600;
-  color: #e8f5e9;
-  z-index: 1;
-}
-
-.status-badge {
+/* Badges */
+.role-badge,
+.status-badge,
+.data-badge {
   display: inline-block;
   padding: 6px 12px;
   border-radius: 6px;
@@ -145,6 +121,36 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+}
+
+.role-badge {
+  background: rgba(82, 183, 136, 0.2);
+  color: #52B788;
+}
+
+.role-badge.admin {
+  background: rgba(230, 150, 50, 0.2);
+  color: #e6962a;
+}
+
+.role-badge.operator {
+  background: rgba(60, 130, 220, 0.2);
+  color: #3c82dc;
+}
+
+.role-badge.cliente {
+  background: rgba(82, 183, 136, 0.2);
+  color: #52B788;
+}
+
+.data-badge {
+  background: rgba(176, 212, 177, 0.1);
+  color: #cde2d0;
+  font-family: 'Courier New', Courier, monospace;
+  text-transform: uppercase;
+}
+
+.status-badge {
   background: rgba(100, 150, 100, 0.2);
   color: #90bb90;
 }
@@ -154,12 +160,14 @@
   color: #52B788;
 }
 
+/* Actions */
 .actions {
   display: flex;
   gap: 8px;
 }
 
 .btn-edit,
+.btn-toggle,
 .btn-delete {
   background: none;
   border: none;
@@ -178,6 +186,14 @@
   background: rgba(82, 183, 136, 0.1);
 }
 
+.btn-toggle {
+  color: #a0c4a0;
+}
+
+.btn-toggle:hover {
+  background: rgba(82, 183, 136, 0.1);
+}
+
 .btn-delete {
   color: #d9756d;
 }
@@ -186,6 +202,7 @@
   background: rgba(217, 117, 109, 0.1);
 }
 
+/* Empty State */
 .empty-state {
   padding: 60px 20px;
   text-align: center;
@@ -197,6 +214,7 @@
   font-size: 16px;
 }
 
+/* Modal */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -271,6 +289,7 @@
   color: #52B788;
 }
 
+/* Form */
 .form-group {
   margin-bottom: 20px;
 }
@@ -348,6 +367,7 @@
   box-shadow: 0 6px 20px rgba(82, 183, 136, 0.3);
 }
 
+/* Responsive */
 @media (max-width: 768px) {
   .management-container {
     padding: 15px;

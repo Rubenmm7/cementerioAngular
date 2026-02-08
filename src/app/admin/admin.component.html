@@ -73,8 +73,8 @@
             <p>Cementerios</p>
           </div>
           <div class="card stats-card">
-            <h3>{{ stats.usuariosActivos }}</h3>
-            <p>Usuarios Activos</p>
+            <h3>{{ stats.totalUsuarios}}</h3>
+            <p>Usuarios</p>
           </div>
           <div class="card stats-card">
             <h3>{{ stats.difuntosRegistrados }}</h3>
@@ -84,78 +84,19 @@
       }
 
       @if (activeTab === 'ayuntamientos') {
-        <div class="table-container card">
-          <div class="card-header d-flex justify-content-between">
-            <h3>Listado de Ayuntamientos</h3>
-            <button class="btn-primary">+ Crear</button>
-          </div>
-          <table class="table">
-            <thead>
-              <tr>
-                <th>Nombre</th>
-                <th>Dirección</th>
-                <th>Teléfono</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (ayto of ayuntamientos; track ayto.id) {
-                <tr>
-                  <td>{{ ayto.nombre }}</td>
-                  <td>{{ ayto.direccion }}</td>
-                  <td>{{ ayto.telefono }}</td>
-                  <td>
-                    <button class="action-btn edit">✏️</button>
-                    <button class="action-btn delete">🗑️</button>
-                  </td>
-                </tr>
-              } @empty {
-                <tr><td colspan="4">No hay datos.</td></tr>
-              }
-            </tbody>
-          </table>
-        </div>
+        <app-ayuntamientos-management></app-ayuntamientos-management>
       }
 
       @if (activeTab === 'cementerios') {
-        <div class="table-container card">
-          <div class="card-header d-flex justify-content-between">
-            <h3>Listado de Cementerios</h3>
-            <button class="btn-primary">+ Crear</button>
-          </div>
-          <table class="table">
-            <thead>
-              <tr>
-                <th>Nombre</th>
-                <th>Población</th>
-                <th>Ayuntamiento</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (cem of cementerios; track cem.id) {
-                <tr>
-                  <td>{{ cem.nombre }}</td>
-                  <td>{{ cem.poblacion }}</td>
-                  <td>{{ cem.ayuntamiento?.nombre }}</td>
-                  <td>
-                    <button class="action-btn edit">✏️</button>
-                    <button class="action-btn delete" (click)="borrarCementerio(cem.id)">🗑️</button>
-                  </td>
-                </tr>
-              } @empty {
-                <tr><td colspan="4">No hay datos.</td></tr>
-              }
-            </tbody>
-          </table>
-        </div>
+        <app-cementerios-management></app-cementerios-management>
       }
 
-      @if (activeTab === 'usuarios' || activeTab === 'difuntos' || activeTab === 'reports') {
-        <div class="empty-state">
-          <h3>🚧 Sección en Construcción</h3>
-          <p>Próximamente disponible</p>
-        </div>
+      @if (activeTab === 'usuarios') {
+        <app-users-management></app-users-management>
+      }
+
+      @if (activeTab === 'difuntos') {
+        <app-deceased-management></app-deceased-management>
       }
 
     </div>
