@@ -5,7 +5,7 @@
   </div>
 
   <div class="search-bar">
-    <input type="text" placeholder="Buscar por nombre, apellido o parcela..." [(ngModel)]="searchTerm" class="search-input" />
+    <input type="text" placeholder="Buscar por nombre, apellido o cementerio..." [(ngModel)]="searchTerm" class="search-input" />
   </div>
 
   <div class="table-container">
@@ -14,11 +14,11 @@
         <tr>
           <th>ID</th>
           <th>Nombre Completo</th>
-          <th>Fechas</th>
+          <th>DNI</th>
+          <th>Fechas (Nac. - Def.)</th>
           <th>Edad</th>
           <th>Cementerio</th>
-          <th>Parcela</th>
-          <th>Responsable</th>
+          <th>Parcela ID</th>
           <th>Acciones</th>
         </tr>
       </thead>
@@ -27,13 +27,14 @@
           <tr>
             <td>{{ item.id }}</td>
             <td>{{ item.nombre }} {{ item.apellidos }}</td>
+            <td>{{ item.dni }}</td>
             <td>
-              <small>{{ item.fechaNacimiento | date: 'dd/MM/yyyy' }} - {{ item.fechaFallecimiento | date: 'dd/MM/yyyy' }}</small>
+              <small>{{ item.fechaNacimiento | date: 'dd/MM/yyyy' }} - {{ item.fechaDefuncion | date: 'dd/MM/yyyy' }}</small>
             </td>
             <td>{{ getAge(item.fechaNacimiento) }}</td>
-            <td>{{ item.cementerio }}</td>
-            <td><span class="data-badge">{{ item.parcela }}</span></td>
-            <td>{{ item.responsable }}</td>
+            <td>{{ item.nombreCementerio || 'Sin asignar' }}</td>
+            <td><span class="data-badge">{{ item.parcelaId || 'N/A' }}</span></td>
+            
             <td class="actions">
               <button class="btn-edit" (click)="openForm(item)" title="Editar">✏️</button>
               <button class="btn-delete" (click)="deleteDeceased(item.id)" title="Eliminar">🗑️</button>
@@ -59,6 +60,11 @@
 
         <div class="form-row">
           <div class="form-group">
+            <label>DNI</label>
+            <input type="text" [(ngModel)]="selectedDeceased.dni" placeholder="12345678X" />
+          </div>
+
+          <div class="form-group">
             <label>Nombre</label>
             <input type="text" [(ngModel)]="selectedDeceased.nombre" placeholder="Nombre" />
           </div>
@@ -76,38 +82,28 @@
           </div>
 
           <div class="form-group">
-            <label>Fecha de Fallecimiento</label>
-            <input type="date" [(ngModel)]="selectedDeceased.fechaFallecimiento" />
+            <label>Fecha de Defunción</label>
+            <input type="date" [(ngModel)]="selectedDeceased.fechaDefuncion" />
           </div>
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <label>Cementerio</label>
-            <select [(ngModel)]="selectedDeceased.cementerio">
-              <option>Selecciona un cementerio</option>
-              <option>Cementerio Central</option>
-              <option>Cementerio del Norte</option>
-              <option>Cementerio Privado San José</option>
-            </select>
+            <label>Fecha de Enterramiento</label>
+            <input type="date" [(ngModel)]="selectedDeceased.fechaEnterramiento" />
           </div>
-
-          <div class="form-group">
-            <label>Parcela</label>
-            <input type="text" [(ngModel)]="selectedDeceased.parcela" placeholder="A-125" />
+          
+           <div class="form-group">
+            <label>ID Parcela</label>
+            <input type="number" [(ngModel)]="selectedDeceased.parcelaId" placeholder="ID numérico de la parcela" />
           </div>
         </div>
-
+        
         <div class="form-row">
-          <div class="form-group">
-            <label>Responsable</label>
-            <input type="text" [(ngModel)]="selectedDeceased.responsable" placeholder="Nombre del responsable" />
-          </div>
-
-          <div class="form-group">
-            <label>Teléfono Responsable</label>
-            <input type="tel" [(ngModel)]="selectedDeceased.telefono" placeholder="600000000" />
-          </div>
+            <div class="form-group" style="width: 100%;">
+                <label>Biografía (Opcional)</label>
+                <textarea [(ngModel)]="selectedDeceased.biografia" rows="3"></textarea>
+            </div>
         </div>
 
         <div class="modal-footer">

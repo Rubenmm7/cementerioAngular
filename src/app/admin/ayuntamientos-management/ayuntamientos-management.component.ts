@@ -41,7 +41,7 @@ export class AyuntamientosManagementComponent implements OnInit {
   }
 
   resetSelectedAyuntamiento(): Ayuntamiento {
-    return { id: 0, nombre: '', direccion: '', telefono: '', email: '' };
+    return { id: 0, nombre: '', direccion: '', telefono: '' };
   }
 
   openForm(ayuntamiento?: Ayuntamiento): void {
@@ -60,18 +60,28 @@ export class AyuntamientosManagementComponent implements OnInit {
   }
 
   saveAyuntamiento(): void {
-    const operation = this.isEditing
-      ? this.ayuntamientoService.updateAyuntamiento(this.selectedAyuntamiento.id, this.selectedAyuntamiento)
-      : this.ayuntamientoService.createAyuntamiento(this.selectedAyuntamiento);
+    if (this.isEditing) {
+      this.ayuntamientoService.updateAyuntamiento(this.selectedAyuntamiento.id, this.selectedAyuntamiento)
+        .subscribe({
+          next: () => this.handleSuccess(),
+          error: (err) => console.error("Error actualizando:", err)
+        });
+    } else {
+      const { id, ...newAyuntamiento } = this.selectedAyuntamiento;
+      
+      this.ayuntamientoService.createAyuntamiento(newAyuntamiento as any)
+        .subscribe({
+          next: () => this.handleSuccess(),
+          error: (err) => console.error("Error creando:", err)
+        });
+    }
+  }
 
-    operation.subscribe({
-      next: () => {
-        this.loadAyuntamientos();
-        this.ayuntamientoChange.emit();
-        this.closeForm();
-      },
-      error: (err) => console.error("Error guardando ayuntamiento:", err)
-    });
+  // Método auxiliar para no repetir código en el next
+  private handleSuccess(): void {
+    this.loadAyuntamientos();
+    this.ayuntamientoChange.emit();
+    this.closeForm();
   }
 
   deleteAyuntamiento(id: number): void {
@@ -89,8 +99,7 @@ export class AyuntamientosManagementComponent implements OnInit {
   get filteredAyuntamientos(): Ayuntamiento[] {
     const searchTerm = this.searchTerm.toLowerCase();
     return this.ayuntamientos.filter(a =>
-      (a.nombre && a.nombre.toLowerCase().includes(searchTerm)) ||
-      (a.email && a.email.toLowerCase().includes(searchTerm))
+      (a.nombre && a.nombre.toLowerCase().includes(searchTerm))
     );
   }
 }

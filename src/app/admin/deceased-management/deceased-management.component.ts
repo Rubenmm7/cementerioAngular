@@ -2,19 +2,7 @@ import { Component, OnInit, ChangeDetectorRef, Output, EventEmitter } from '@ang
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DifuntoService } from '../../services/difunto-service';
-
-interface Deceased {
-  id?: number;
-  nombre: string;
-  apellidos: string;
-  fechaNacimiento: string;
-  fechaFallecimiento: string;
-  cementerio: string;
-  parcela: string;
-  responsable: string;
-  telefono: string;
-  estado: 'activo' | 'inactivo';
-}
+import { Difunto } from '../../models/difunto.model';
 
 @Component({
   selector: 'app-deceased-management',
@@ -23,34 +11,39 @@ interface Deceased {
   templateUrl: './deceased-management.component.html',
   styleUrls: ['../management-styles.css']
 })
-
 export class DeceasedManagementComponent implements OnInit {
-  deceased: Deceased[] = [];
+  
+  deceased: Difunto[] = [];
   showForm = false;
   isEditing = false;
+  searchTerm = '';
 
   @Output() deceasedChange = new EventEmitter<void>();
 
-  selectedDeceased: Deceased = {
-    nombre: '',
-    apellidos: '',
-    fechaNacimiento: '',
-    fechaFallecimiento: '',
-    cementerio: '',
-    parcela: '',
-    responsable: '',
-    telefono: '',
-    estado: 'activo'
-  };
-  searchTerm = '';
+  selectedDeceased: Difunto = this.resetDeceased();
 
   constructor(
     private difuntoService: DifuntoService,
     private cdr: ChangeDetectorRef
-    ) { }
+  ) { }
 
   ngOnInit(): void {
     this.loadDeceased();
+  }
+
+  resetDeceased(): Difunto {
+    return {
+      id: 0,
+      nombre: '',
+      apellidos: '',
+      dni: '',
+      fechaNacimiento: '',
+      fechaDefuncion: '',
+      fechaEnterramiento: '',
+      biografia: '',
+      parcelaId: undefined,
+      nombreCementerio: ''
+    };
   }
 
   loadDeceased(): void {
@@ -59,27 +52,17 @@ export class DeceasedManagementComponent implements OnInit {
         this.deceased = data;
         this.cdr.detectChanges();
       },
-      error: (e) => console.error(e)
+      error: (e) => console.error('Error cargando difuntos', e)
     });
   }
 
-  openForm(item?: Deceased): void {
+  openForm(item?: Difunto): void {
     if (item) {
       this.isEditing = true;
       this.selectedDeceased = { ...item };
     } else {
       this.isEditing = false;
-      this.selectedDeceased = {
-        nombre: '',
-        apellidos: '',
-        fechaNacimiento: '',
-        fechaFallecimiento: '',
-        cementerio: '',
-        parcela: '',
-        responsable: '',
-        telefono: '',
-        estado: 'activo'
-      };
+      this.selectedDeceased = this.resetDeceased();
     }
     this.showForm = true;
   }
@@ -88,19 +71,31 @@ export class DeceasedManagementComponent implements OnInit {
     this.showForm = false;
   }
 
-  saveDeceased(): void {
-    const operation = this.isEditing && this.selectedDeceased.id
-      ? this.difuntoService.updateDifunto(this.selectedDeceased.id, this.selectedDeceased)
-      : this.difuntoService.createDifunto(this.selectedDeceased);
+saveDeceased(): void {
+    // Si necesitas validaciones (ej: DNI obligatorio), ponlas aquí
+    if (!this.selectedDeceased.nombre || !this.selectedDeceased.apellidos) {
+        alert("Nombre y Apellidos son obligatorios");
+        return;
+    }
 
-    operation.subscribe({
-      next: () => {
-        this.loadDeceased();
-        this.deceasedChange.emit();
-        this.closeForm();
-      },
-      error: (err) => console.error("Error guardando difunto:", err)
-    });
+    if (this.isEditing && this.selectedDeceased.id) {
+      // MODO EDICIÓN: Enviamos el ID
+      this.difuntoService.updateDifunto(this.selectedDeceased.id, this.selectedDeceased)
+        .subscribe({
+          next: () => this.handleSuccess(),
+          error: (err) => console.error("Error actualizando difunto:", err)
+        });
+    } else {
+      // MODO CREACIÓN: Eliminamos el ID '0'
+      const { id, ...newDifunto } = this.selectedDeceased;
+      
+      // Enviamos el objeto sin ID (newDifunto)
+      this.difuntoService.createDifunto(newDifunto as any)
+        .subscribe({
+          next: () => this.handleSuccess(),
+          error: (err) => console.error("Error creando difunto:", err)
+        });
+    }
   }
 
   deleteDeceased(id?: number): void {
@@ -116,6 +111,7 @@ export class DeceasedManagementComponent implements OnInit {
   }
 
   getAge(fechaNacimiento: string): number {
+    if (!fechaNacimiento) return 0;
     const birth = new Date(fechaNacimiento);
     const today = new Date();
     let age = today.getFullYear() - birth.getFullYear();
@@ -126,11 +122,18 @@ export class DeceasedManagementComponent implements OnInit {
     return age;
   }
 
-  get filteredDeceased(): Deceased[] {
+  get filteredDeceased(): Difunto[] {
+    const term = this.searchTerm.toLowerCase();
     return this.deceased.filter(d =>
-    (d.nombre.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-      d.apellidos.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-      d.parcela.toLowerCase().includes(this.searchTerm.toLowerCase()))
+      (d.nombre && d.nombre.toLowerCase().includes(term)) ||
+      (d.apellidos && d.apellidos.toLowerCase().includes(term)) ||
+      (d.nombreCementerio && d.nombreCementerio.toLowerCase().includes(term))
     );
+  }
+
+  private handleSuccess(): void {
+    this.loadDeceased();
+    this.deceasedChange.emit();
+    this.closeForm();
   }
 }

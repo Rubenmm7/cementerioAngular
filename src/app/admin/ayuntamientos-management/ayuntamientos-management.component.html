@@ -5,7 +5,7 @@
   </div>
 
   <div class="search-bar">
-    <input type="text" placeholder="Buscar por nombre o email..." [(ngModel)]="searchTerm" class="search-input" />
+    <input type="text" placeholder="Buscar por nombre..." [(ngModel)]="searchTerm" class="search-input" />
   </div>
 
   <div class="table-container">
@@ -16,7 +16,6 @@
           <th>Nombre</th>
           <th>Dirección</th>
           <th>Teléfono</th>
-          <th>Email</th>
           <th>Acciones</th>
         </tr>
       </thead>
@@ -27,7 +26,6 @@
             <td>{{ ayto.nombre }}</td>
             <td>{{ ayto.direccion }}</td>
             <td>{{ ayto.telefono }}</td>
-            <td>{{ ayto.email }}</td>
             <td class="actions">
               <button class="btn-edit" (click)="openForm(ayto)" title="Editar">✏️</button>
               <button class="btn-delete" (click)="deleteAyuntamiento(ayto.id)" title="Eliminar">🗑️</button>
@@ -60,11 +58,6 @@
         <div class="form-group">
           <label>Dirección</label>
           <input type="text" [(ngModel)]="selectedAyuntamiento.direccion" placeholder="Dirección completa" />
-        </div>
-
-        <div class="form-group">
-          <label>Email</label>
-          <input type="email" [(ngModel)]="selectedAyuntamiento.email" placeholder="correo@example.com" />
         </div>
 
         <div class="form-group">

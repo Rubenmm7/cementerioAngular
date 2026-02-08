@@ -45,7 +45,7 @@
                 }
               </span>
             </td>
-            <td>{{ user.ayuntamiento?.nombre || 'N/A' }}</td>
+            <td>{{ user.ayuntamientoId || 'N/A' }}</td>
             <td class="actions">
               <button class="btn-edit" (click)="openForm(user)" title="Editar">✏️</button>
               <button class="btn-delete" (click)="deleteUser(user.id)" title="Eliminar">🗑️</button>
@@ -86,10 +86,10 @@
 
         <div class="form-group">
           <label>Ayuntamiento</label>
-          <select [(ngModel)]="selectedUser.ayuntamiento" name="ayuntamiento" required>
+          <select [(ngModel)]="selectedUser.ayuntamientoId" name="ayuntamiento" required>
             <option [ngValue]="null" disabled>Selecciona un ayuntamiento</option>
             @for(ayto of ayuntamientos; track ayto.id) {
-              <option [ngValue]="ayto.id">{{ ayto.nombre }}</option>
+              <option [ngValue]="ayto.id">{{ ayto.nombre}}</option>
             }
           </select>
         </div>

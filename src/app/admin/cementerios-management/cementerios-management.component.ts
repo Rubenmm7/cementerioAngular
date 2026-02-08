@@ -56,18 +56,24 @@ export class CementeriosManagementComponent implements OnInit {
 
   resetSelectedCementerio() {
     return {
-    id: 0,
-    ayuntamiento: undefined,
-    nombre: '',
-    direccion: '',
-    poblacion: ''
-};
+      id: 0,
+      ayuntamiento: undefined,
+      nombre: '',
+      direccion: '',
+      poblacion: '',
+      provincia: '',
+      codigoPostal: '',
+      emailContacto: ''
+    };
   }
 
-  openForm(cementerio?: Cementerio): void {
+openForm(cementerio?: Cementerio): void {
     if (cementerio) {
       this.isEditing = true;
-      this.selectedCementerio = { ...cementerio, ayuntamiento: cementerio.ayuntamiento ? cementerio.ayuntamiento.id : undefined };
+      this.selectedCementerio = { 
+        ...cementerio, 
+        ayuntamiento: cementerio.ayuntamiento ? cementerio.ayuntamiento.id : undefined 
+      };
     } else {
       this.isEditing = false;
       this.selectedCementerio = this.resetSelectedCementerio();
@@ -79,21 +85,38 @@ export class CementeriosManagementComponent implements OnInit {
     this.showForm = false;
   }
 
-  saveCementerio(): void {
-    const payload = { ...this.selectedCementerio, ayuntamiento: { id: this.selectedCementerio.ayuntamiento } };
+saveCementerio(): void {
+    const idAyuntamientoSeleccionado = this.selectedCementerio.ayuntamiento;
 
-    const operation = this.isEditing
-      ? this.cementerioService.updateCementerio(payload.id, payload)
-      : this.cementerioService.createCementerio(payload);
+    if (!idAyuntamientoSeleccionado) {
+        alert("El ayuntamiento es obligatorio");
+        return;
+    }
 
-    operation.subscribe({
-      next: () => {
-        this.loadCementerios();
-        this.cementerioChange.emit();
-        this.closeForm();
-      },
-      error: (err) => console.error("Error guardando cementerio:", err)
-    });
+    const payload = {
+        ...this.selectedCementerio,
+        ayuntamientoId: idAyuntamientoSeleccionado,
+        ayuntamiento: null
+    };
+
+    if (this.isEditing) {
+        this.cementerioService.updateCementerio(payload.id, payload).subscribe({
+            next: () => this.handleSuccess(),
+            error: (e) => console.error(e)
+        });
+    } else {
+        const { id, ...nuevo } = payload;
+        this.cementerioService.createCementerio(nuevo).subscribe({
+            next: () => this.handleSuccess(),
+            error: (e) => console.error(e)
+        });
+    }
+  }
+
+  private handleSuccess(): void {
+    this.loadCementerios();
+    this.cementerioChange.emit();
+    this.closeForm();
   }
 
   deleteCementerio(id: number): void {

@@ -28,8 +28,9 @@ export class UsersManagementComponent implements OnInit {
     apellidos: '',
     email: '',
     telefono: '',
+    password: '',
     role: 'CLIENTE',
-    ayuntamiento: null
+    ayuntamientoId: null
   };
 
   constructor(
@@ -63,10 +64,15 @@ export class UsersManagementComponent implements OnInit {
     });
   }
 
-  openForm(user?: UserResponseDTO): void {
+openForm(user?: UserResponseDTO): void {
     if (user) {
       this.isEditing = true;
-      this.selectedUser = { ...user, ayuntamiento: user.ayuntamiento ? user.ayuntamiento.id : null };
+      // Mapeamos los datos que vienen de la tabla al formulario
+      this.selectedUser = { 
+        ...user, 
+        password: '', // No mostramos la contraseña al editar
+        ayuntamientoId: user.ayuntamientoId 
+      };
     } else {
       this.isEditing = false;
       this.selectedUser = {
@@ -74,8 +80,10 @@ export class UsersManagementComponent implements OnInit {
         apellidos: '',
         email: '',
         telefono: '',
+        direccion: '',
+        password: '',
         role: 'CLIENTE',
-        ayuntamiento: null
+        ayuntamientoId: null
       };
     }
     this.showForm = true;
@@ -85,28 +93,36 @@ export class UsersManagementComponent implements OnInit {
     this.showForm = false;
   }
 
-  saveUser(): void {
+saveUser(): void {
     const payload = {
-      ...this.selectedUser,
-      ayuntamiento: this.selectedUser.ayuntamiento ? { id: this.selectedUser.ayuntamiento } : null
+      nombre: this.selectedUser.nombre,
+      apellidos: this.selectedUser.apellidos,
+      email: this.selectedUser.email,
+      telefono: this.selectedUser.telefono,
+      direccion: this.selectedUser.direccion,
+      role: this.selectedUser.role,
+      ayuntamientoId: this.selectedUser.ayuntamientoId, // Enviamos el ID plano
+      password: this.selectedUser.password // Solo se enviará si se rellena
     };
-
-    if (this.isEditing && payload.id) {
-      this.userService.updateUser(payload.id, payload).subscribe({
-        next: () => {
-          this.loadUsers();
-          this.userChange.emit();
-          this.closeForm();
-        }
-      });
+    
+    if (this.isEditing && this.selectedUser.id) {
+        this.userService.updateUser(this.selectedUser.id, payload).subscribe({
+            next: () => {
+                this.loadUsers();
+                this.userChange.emit();
+                this.closeForm();
+            },
+            error: (e) => console.error(e)
+        });
     } else {
-      this.userService.createUser(payload).subscribe({
-        next: () => {
-          this.loadUsers();
-          this.userChange.emit();
-          this.closeForm();
-        }
-      });
+        this.userService.createUser(payload).subscribe({
+            next: () => {
+                this.loadUsers();
+                this.userChange.emit();
+                this.closeForm();
+            },
+            error: (e) => console.error(e)
+        });
     }
   }
 
