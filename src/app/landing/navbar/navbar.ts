@@ -9,6 +9,7 @@ import { AuthService } from '../../auth/auth';
   templateUrl: './navbar.html',
   styleUrl: './navbar.css',
 })
+
 export class Navbar implements OnInit {
   isLoggedIn = false;
   isAdmin = false;
@@ -17,6 +18,17 @@ export class Navbar implements OnInit {
 
   ngOnInit(): void {
     this.checkAuthStatus();
+  }
+
+  irAInicio(): void {
+    // Navegamos a la raíz
+    this.router.navigate(['/']).then(() => {
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: 'smooth'
+      });
+    });
   }
 
   checkAuthStatus(): void {

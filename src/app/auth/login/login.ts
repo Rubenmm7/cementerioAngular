@@ -42,29 +42,29 @@ export class Login implements OnInit {
       return;
     }
 
-    this.isLoading = true;
-    this.error = '';
+this.isLoading = true;
+this.error = '';
 
-    const data: LoginRequest = this.loginForm.value;
+const data: LoginRequest = this.loginForm.value; 
 
-    this.authService.login(this.loginForm.value).subscribe({
-      next: res => {
-        this.authService.saveSession(res);
-        // Guardar datos del usuario si existen en la respuesta
-        if (res.usuario) {
-          localStorage.setItem('userData', JSON.stringify(res.usuario));
-        }
-        // Guardar roles si existen en la respuesta
-        if (res.roles) {
-          localStorage.setItem('roles', JSON.stringify(res.roles));
-        }
-        this.isLoading = false;
-        this.router.navigate(['/']);
-      },
-      error: () => {
-        this.isLoading = false;
-        this.error = 'Usuario o contraseña incorrectos';
-      }
-    });
+this.authService.login(data).subscribe({
+  next: (res) => {
+    this.authService.saveSession(res);
+    if (this.authService.hasRole('ADMIN')) {
+      this.router.navigate(['/admin']);
+    } else {
+      this.router.navigate(['/']);
+    }
+  },
+  error: (err) => {
+    this.isLoading = false;
+    this.error = 'Credenciales incorrectas';
+    console.error(err);
   }
+
+  });
 }
+
+}
+
+

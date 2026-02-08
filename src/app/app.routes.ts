@@ -7,10 +7,12 @@ import { UsersManagementComponent } from './admin/users-management/users-managem
 import { CementeriosManagementComponent } from './admin/cementerios-management/cementerios-management.component';
 import { DeceasedManagementComponent } from './admin/deceased-management/deceased-management.component';
 import { ReportsComponent } from './admin/reports/reports.component';
+import { BusquedaDifuntos } from './pages/busqueda-difuntos/busqueda-difuntos';
 
 export const routes: Routes = [
   { path: '', component: Landing },
   { path: 'login', component: Login },
+       { path: 'busqueda', component: BusquedaDifuntos },
   {
     path: 'admin',
     component: AdminComponent,
@@ -19,7 +21,8 @@ export const routes: Routes = [
       { path: 'users', component: UsersManagementComponent },
       { path: 'cemeteries', component: CementeriosManagementComponent },
       { path: 'deceased', component: DeceasedManagementComponent },
-      { path: 'reports', component: ReportsComponent }
+      { path: 'reports', component: ReportsComponent },
+ 
     ]
   },
   { path: '**', redirectTo: '' }
