@@ -14,6 +14,7 @@
       <thead>
         <tr>
           <th>ID</th>
+          <th>Foto</th>
           <th>Nombre Completo</th>
           <th>DNI</th>
           <th>Fechas (Nac. - Def.)</th>
@@ -27,6 +28,11 @@
         @for (item of filteredDeceased; track item.id) {
         <tr>
           <td>{{ item.id }}</td>
+          <td>
+            <div class="avatar-thumbnail">
+              <img [src]="getPhotoUrl(item.fotoUrl)" alt="Foto de {{ item.nombre }}" class="thumbnail-img">
+            </div>
+          </td>
           <td>{{ item.nombre }} {{ item.apellidos }}</td>
           <td>{{ item.dni }}</td>
           <td>
@@ -60,91 +66,128 @@
         <button class="btn-close" (click)="closeForm()">✕</button>
       </div>
 
-      <!-- Fila 1: DNI, Nombre, Apellidos -->
-      <div class="form-row">
-        <div class="form-group">
-          <label>DNI</label>
-          <input type="text" [(ngModel)]="selectedDeceased.dni" placeholder="12345678X" />
+      <form #difForm="ngForm" (ngSubmit)="saveDeceased()">
+
+        <!-- Fila 1: DNI, Nombre, Apellidos -->
+        <div class="form-row">
+          <div class="form-group">
+            <label>DNI</label>
+            <input type="text" name="dni" [(ngModel)]="selectedDeceased.dni" placeholder="12345678X" />
+          </div>
+
+          <div class="form-group">
+            <label>Nombre <span class="required">*</span></label>
+            <input type="text" name="nombre" [(ngModel)]="selectedDeceased.nombre" #nombre="ngModel"
+              placeholder="Nombre" required />
+            <span class="error-text" *ngIf="nombre.invalid && (nombre.dirty || nombre.touched)">El nombre es
+              obligatorio.</span>
+          </div>
+
+          <div class="form-group">
+            <label>Apellidos <span class="required">*</span></label>
+            <input type="text" name="apellidos" [(ngModel)]="selectedDeceased.apellidos" #apellidos="ngModel"
+              placeholder="Apellidos" required />
+            <span class="error-text" *ngIf="apellidos.invalid && (apellidos.dirty || apellidos.touched)">Los apellidos
+              son obligatorios.</span>
+          </div>
         </div>
 
-        <div class="form-group">
-          <label>Nombre <span class="required">*</span></label>
-          <input type="text" [(ngModel)]="selectedDeceased.nombre" placeholder="Nombre" />
+        <!-- Fila 2: Fechas -->
+        <div class="form-row">
+          <div class="form-group">
+            <label>Fecha de Nacimiento</label>
+            <input type="date" name="fechaNacimiento" [(ngModel)]="selectedDeceased.fechaNacimiento" />
+          </div>
+
+          <div class="form-group">
+            <label>Fecha de Defunción</label>
+            <input type="date" name="fechaDefuncion" [(ngModel)]="selectedDeceased.fechaDefuncion" />
+          </div>
+
+          <div class="form-group">
+            <label>Fecha de Enterramiento</label>
+            <input type="date" name="fechaEnterramiento" [(ngModel)]="selectedDeceased.fechaEnterramiento" />
+          </div>
         </div>
 
-        <div class="form-group">
-          <label>Apellidos <span class="required">*</span></label>
-          <input type="text" [(ngModel)]="selectedDeceased.apellidos" placeholder="Apellidos" />
-        </div>
-      </div>
+        <!-- Fila 3: Cementerio + Parcela -->
+        <div class="form-row">
+          <div class="form-group form-group--full">
+            <label>Cementerio</label>
+            <select name="cementerio" [ngModel]="selectedCementerioId" (ngModelChange)="onCementerioChange($event)">
+              <option [ngValue]="null">— Sin cementerio asignado —</option>
+              @for (cem of cementerios; track cem.id) {
+              <option [ngValue]="cem.id">{{ cem.nombre }}
+                @if (cem.poblacion) { — {{ cem.poblacion }} }
+              </option>
+              }
+            </select>
+          </div>
 
-      <!-- Fila 2: Fechas -->
-      <div class="form-row">
-        <div class="form-group">
-          <label>Fecha de Nacimiento</label>
-          <input type="date" [(ngModel)]="selectedDeceased.fechaNacimiento" />
-        </div>
-
-        <div class="form-group">
-          <label>Fecha de Defunción</label>
-          <input type="date" [(ngModel)]="selectedDeceased.fechaDefuncion" />
-        </div>
-
-        <div class="form-group">
-          <label>Fecha de Enterramiento</label>
-          <input type="date" [(ngModel)]="selectedDeceased.fechaEnterramiento" />
-        </div>
-      </div>
-
-      <!-- Fila 3: Cementerio + Parcela -->
-      <div class="form-row">
-        <div class="form-group form-group--full">
-          <label>Cementerio</label>
-          <select [ngModel]="selectedCementerioId" (ngModelChange)="onCementerioChange($event)">
-            <option [ngValue]="null">— Sin cementerio asignado —</option>
-            @for (cem of cementerios; track cem.id) {
-            <option [ngValue]="cem.id">{{ cem.nombre }}
-              @if (cem.poblacion) { — {{ cem.poblacion }} }
-            </option>
+          <div class="form-group form-group--full">
+            <label>Parcela <span class="label-optional">(opcional)</span></label>
+            @if (!selectedCementerioId) {
+            <select disabled>
+              <option>— Selecciona un cementerio primero —</option>
+            </select>
+            <small class="field-hint">Elige un cementerio para ver sus parcelas disponibles.</small>
+            } @else if (parcelas.length === 0) {
+            <select disabled>
+              <option>— Este cementerio no tiene parcelas —</option>
+            </select>
+            } @else {
+            <select name="parcela" [ngModel]="selectedParcelaId" (ngModelChange)="selectedParcelaId = $event">
+              <option [ngValue]="null">— Sin parcela asignada —</option>
+              @for (p of parcelas; track p.id) {
+              <option [ngValue]="p.id">{{ parcelaLabel(p) }}</option>
+              }
+            </select>
             }
-          </select>
+          </div>
         </div>
 
-        <div class="form-group form-group--full">
-          <label>Parcela <span class="label-optional">(opcional)</span></label>
-          @if (!selectedCementerioId) {
-          <select disabled>
-            <option>— Selecciona un cementerio primero —</option>
-          </select>
-          <small class="field-hint">Elige un cementerio para ver sus parcelas disponibles.</small>
-          } @else if (parcelas.length === 0) {
-          <select disabled>
-            <option>— Este cementerio no tiene parcelas —</option>
-          </select>
-          } @else {
-          <select [ngModel]="selectedParcelaId" (ngModelChange)="selectedParcelaId = $event">
-            <option [ngValue]="null">— Sin parcela asignada —</option>
-            @for (p of parcelas; track p.id) {
-            <option [ngValue]="p.id">{{ parcelaLabel(p) }}</option>
-            }
-          </select>
-          }
+        <!-- Fila 4: Biografía -->
+        <div class="form-row">
+          <div class="form-group form-group--full">
+            <label>Biografía <span class="label-optional">(opcional)</span></label>
+            <textarea name="biografia" [(ngModel)]="selectedDeceased.biografia" rows="4"
+              placeholder="Escribe aquí una breve descripción o nota sobre el difunto..."></textarea>
+          </div>
         </div>
-      </div>
 
-      <!-- Fila 4: Biografía -->
-      <div class="form-row">
-        <div class="form-group form-group--full">
-          <label>Biografía <span class="label-optional">(opcional)</span></label>
-          <textarea [(ngModel)]="selectedDeceased.biografia" rows="4"
-            placeholder="Escribe aquí una breve descripción o nota sobre el difunto..."></textarea>
+        <!-- Fila 5: Foto -->
+        <div class="form-row">
+          <div class="form-group form-group--full">
+            <label>Fotografía del Difunto <span class="label-optional">(jpg, png, webp - Máx 2MB)</span></label>
+
+            <!-- Contenedor Visual de Subida -->
+            <div class="upload-container">
+              <!-- Vista previa si hay imagen -->
+              <div class="image-preview" *ngIf="imagePreview">
+                <img [src]="imagePreview" alt="Vista previa de la foto" class="preview-img">
+                <button type="button" class="btn-remove-image" (click)="removeImage()"
+                  title="Eliminar imagen">✕</button>
+              </div>
+
+              <!-- Input File (se oculta si ya hay preview, o se muestra debajo) -->
+              <div class="file-input-wrapper" *ngIf="!imagePreview">
+                <input type="file" id="fotoInput" accept="image/png, image/jpeg, image/webp"
+                  (change)="onFileSelected($event)" class="file-input" />
+                <div class="upload-placeholder">
+                  <span class="upload-icon">📷</span>
+                  <span class="upload-text">Haz clic o arrastra una imagen aquí</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <div class="modal-footer">
-        <button class="btn-cancel" (click)="closeForm()">Cancelar</button>
-        <button class="btn-save" (click)="saveDeceased()">Guardar</button>
-      </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-cancel" (click)="closeForm()">Cancelar</button>
+          <button type="submit" class="btn-save" [disabled]="!difForm.form.valid">Guardar</button>
+        </div>
+
+      </form>
     </div>
   </div>
   }

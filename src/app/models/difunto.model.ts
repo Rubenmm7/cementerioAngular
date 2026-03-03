@@ -9,4 +9,5 @@ export interface Difunto {
     biografia?: string;
     parcelaId?: number;
     nombreCementerio?: string;
+    fotoUrl?: string;
 }

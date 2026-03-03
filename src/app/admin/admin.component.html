@@ -1,18 +1,23 @@
 <div class="admin-wrapper">
-  
+
   <aside class="sidebar" [class.open]="sidebarOpen">
     <div class="sidebar-header">
-      <div class="logo-section">
+      <a routerLink="/" class="logo-section" style="cursor: pointer; text-decoration: none;">
         <div class="logo-icon">✦</div>
         <div class="logo-text">
           <h3>AETERNUM</h3>
           <span>Admin Panel</span>
         </div>
-      </div>
+      </a>
       <button class="close-btn" (click)="toggleSidebar()">✕</button>
     </div>
 
     <nav class="sidebar-nav">
+      <a routerLink="/" class="nav-item back-home-item">
+        <span class="nav-label">Volver al Inicio</span>
+      </a>
+      <div class="nav-divider"></div>
+
       <a (click)="cambiarPestana('dashboard')" [class.active]="activeTab === 'dashboard'" class="nav-item">
         <span class="nav-label">Dashboard</span>
       </a>
@@ -55,48 +60,48 @@
       <div class="header-title">
         <h1>Panel de Administración</h1>
         <p *ngIf="activeTab === 'dashboard'">Vista general del sistema</p>
-        <p *ngIf="activeTab === 'cementerios'">Gestión de camposantos</p>
+        <p *ngIf="activeTab === 'cementerios'">Gestión de cementerios</p>
         <p *ngIf="activeTab === 'ayuntamientos'">Entidades gestoras</p>
       </div>
     </header>
 
     <div class="content-area">
-      
+
       @if (activeTab === 'dashboard') {
-        <div class="dashboard-grid">
-          <div class="card stats-card">
-            <h3>{{ stats.totalAyuntamientos }}</h3>
-            <p>Ayuntamientos</p>
-          </div>
-          <div class="card stats-card">
-            <h3>{{ stats.totalCementerios }}</h3>
-            <p>Cementerios</p>
-          </div>
-          <div class="card stats-card">
-            <h3>{{ stats.totalUsuarios}}</h3>
-            <p>Usuarios</p>
-          </div>
-          <div class="card stats-card">
-            <h3>{{ stats.difuntosRegistrados }}</h3>
-            <p>Difuntos</p>
-          </div>
+      <div class="dashboard-grid">
+        <div class="card stats-card">
+          <h3>{{ stats.totalAyuntamientos }}</h3>
+          <p>Ayuntamientos</p>
         </div>
+        <div class="card stats-card">
+          <h3>{{ stats.totalCementerios }}</h3>
+          <p>Cementerios</p>
+        </div>
+        <div class="card stats-card">
+          <h3>{{ stats.totalUsuarios}}</h3>
+          <p>Usuarios</p>
+        </div>
+        <div class="card stats-card">
+          <h3>{{ stats.difuntosRegistrados }}</h3>
+          <p>Difuntos</p>
+        </div>
+      </div>
       }
 
       @if (activeTab === 'ayuntamientos') {
-        <app-ayuntamientos-management></app-ayuntamientos-management>
+      <app-ayuntamientos-management></app-ayuntamientos-management>
       }
 
       @if (activeTab === 'cementerios') {
-        <app-cementerios-management></app-cementerios-management>
+      <app-cementerios-management></app-cementerios-management>
       }
 
       @if (activeTab === 'usuarios') {
-        <app-users-management></app-users-management>
+      <app-users-management></app-users-management>
       }
 
       @if (activeTab === 'difuntos') {
-        <app-deceased-management></app-deceased-management>
+      <app-deceased-management></app-deceased-management>
       }
 
     </div>

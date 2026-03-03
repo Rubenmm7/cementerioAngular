@@ -1,14 +1,14 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../auth/auth';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { CementerioService } from '../services/cementerio-service';
 import { UserService } from '../services/user-service';
 import { DifuntoService } from '../services/difunto-service';
 import { AyuntamientoService } from '../services/ayuntamiento-service';
 import { UsersManagementComponent } from './users-management/users-management.component';
 import { AyuntamientosManagementComponent } from './ayuntamientos-management/ayuntamientos-management.component';
-import {CementeriosManagementComponent } from "./cementerios-management/cementerios-management.component";
+import { CementeriosManagementComponent } from "./cementerios-management/cementerios-management.component";
 import { DeceasedManagementComponent } from './deceased-management/deceased-management.component';
 import { forkJoin } from 'rxjs';
 
@@ -17,11 +17,12 @@ import { forkJoin } from 'rxjs';
   standalone: true,
   imports: [
     CommonModule,
+    RouterLink,
     UsersManagementComponent,
     AyuntamientosManagementComponent,
     CementeriosManagementComponent,
     DeceasedManagementComponent
-],
+  ],
   templateUrl: './admin.component.html',
   styleUrls: ['./admin.component.css']
 })
@@ -30,7 +31,7 @@ export class AdminComponent implements OnInit {
   sidebarOpen = false;
   activeTab = 'dashboard';
   currentUser = 'Admin';
-    stats = {
+  stats = {
     totalAyuntamientos: 0,
     totalCementerios: 0,
     totalUsuarios: 0,
@@ -45,12 +46,12 @@ export class AdminComponent implements OnInit {
     private authService: AuthService,
     private router: Router,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.cargarDatos();
     // Recuperar nombre del usuario si está en el token/localStorage
-    const tokenUser = localStorage.getItem('username'); 
+    const tokenUser = localStorage.getItem('username');
     if (tokenUser) this.currentUser = tokenUser;
   }
 

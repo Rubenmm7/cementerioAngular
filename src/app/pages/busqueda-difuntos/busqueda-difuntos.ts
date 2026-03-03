@@ -118,4 +118,9 @@ export class BusquedaDifuntos implements OnInit {
     document.body.style.overflow = '';
     this.cdr.detectChanges();
   }
+
+  getPhotoUrl(filename: string | undefined): string {
+    if (!filename) return 'favicon.svg';
+    return `http://localhost:8080/api/difuntos/images/${filename}`;
+  }
 }

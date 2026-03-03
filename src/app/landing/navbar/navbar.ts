@@ -14,21 +14,18 @@ export class Navbar implements OnInit {
   isLoggedIn = false;
   isAdmin = false;
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private authService: AuthService, private router: Router) { }
 
   ngOnInit(): void {
     this.checkAuthStatus();
   }
 
   irAInicio(): void {
-    // Navegamos a la raíz
-    this.router.navigate(['/']).then(() => {
-      window.scrollTo({
-        top: 0,
-        left: 0,
-        behavior: 'smooth'
-      });
-    });
+    if (this.router.url === '/') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      this.router.navigate(['/']);
+    }
   }
 
   checkAuthStatus(): void {

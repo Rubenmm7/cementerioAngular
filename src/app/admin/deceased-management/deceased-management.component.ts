@@ -27,6 +27,9 @@ export class DeceasedManagementComponent implements OnInit {
   selectedCementerioId: number | null = null;
   selectedParcelaId: number | null = null;
 
+  selectedFile: File | null = null;
+  imagePreview: string | ArrayBuffer | null = null;
+
   @Output() deceasedChange = new EventEmitter<void>();
 
   selectedDeceased: Difunto = this.resetDeceased();
@@ -54,7 +57,8 @@ export class DeceasedManagementComponent implements OnInit {
       fechaEnterramiento: null as any,
       biografia: '',
       parcelaId: undefined,
-      nombreCementerio: ''
+      nombreCementerio: '',
+      fotoUrl: ''
     };
   }
 
@@ -79,9 +83,18 @@ export class DeceasedManagementComponent implements OnInit {
   }
 
   openForm(item?: Difunto): void {
+    this.selectedFile = null;
+    this.imagePreview = null;
+
     if (item) {
       this.isEditing = true;
       this.selectedDeceased = { ...item };
+
+      // Si ya tiene foto guardada, mostraremos la URL del backend temporalmente en la vista previa
+      if (item.fotoUrl) {
+        this.imagePreview = `http://localhost:8080/api/difuntos/images/${item.fotoUrl}`;
+      }
+
       // Pre-seleccionar cementerio
       const cem = this.cementerios.find(c => c.nombre === item.nombreCementerio);
       this.selectedCementerioId = cem ? cem.id! : null;
@@ -105,6 +118,8 @@ export class DeceasedManagementComponent implements OnInit {
     this.selectedCementerioId = null;
     this.selectedParcelaId = null;
     this.parcelas = [];
+    this.selectedFile = null;
+    this.imagePreview = null;
   }
 
   onCementerioChange(cemId: number | null): void {
@@ -135,31 +150,83 @@ export class DeceasedManagementComponent implements OnInit {
     return `#${p.id} — Fila ${p.fila}, Col ${p.columna} [${p.tipo}] (${p.estado})`;
   }
 
+  onFileSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      // Validación de tipo de archivo
+      if (!file.type.match(/image\/(jpeg|png|webp)/)) {
+        alert('Solo se permiten imágenes en formato JPEG, PNG o WEBP.');
+        event.target.value = ''; // Resetear input
+        return;
+      }
+
+      // Validación de tamaño (Máximo 2MB)
+      if (file.size > 2 * 1024 * 1024) {
+        alert('El archivo es demasiado grande. El tamaño máximo permitido es de 2MB.');
+        event.target.value = ''; // Resetear input
+        return;
+      }
+
+      this.selectedFile = file;
+
+      // Crear previsualización
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (e.target?.result) {
+          this.imagePreview = e.target.result;
+          this.cdr.detectChanges();
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  removeImage(): void {
+    this.selectedFile = null;
+    this.imagePreview = null;
+    this.selectedDeceased.fotoUrl = ''; // Limpiar referencia si existia
+
+    // Limpiar el valor del input file si está presente en el DOM
+    const fileInput = document.getElementById('fotoInput') as HTMLInputElement;
+    if (fileInput) fileInput.value = '';
+
+    this.cdr.detectChanges();
+  }
+
   saveDeceased(): void {
     if (!this.selectedDeceased.nombre || !this.selectedDeceased.apellidos) {
       alert("Nombre y Apellidos son obligatorios");
       return;
     }
 
-    const toPayload = (d: Difunto) => ({
-      nombre: d.nombre,
-      apellidos: d.apellidos,
-      dni: d.dni || null,
-      fechaNacimiento: d.fechaNacimiento || null,
-      fechaDefuncion: d.fechaDefuncion || null,
-      fechaEnterramiento: d.fechaEnterramiento || null,
-      biografia: d.biografia || null,
-      parcelaId: this.selectedParcelaId || null
-    });
+    const payload = {
+      nombre: this.selectedDeceased.nombre,
+      apellidos: this.selectedDeceased.apellidos,
+      dni: this.selectedDeceased.dni || null,
+      fechaNacimiento: this.selectedDeceased.fechaNacimiento || null,
+      fechaDefuncion: this.selectedDeceased.fechaDefuncion || null,
+      fechaEnterramiento: this.selectedDeceased.fechaEnterramiento || null,
+      biografia: this.selectedDeceased.biografia || null,
+      parcelaId: this.selectedParcelaId || null,
+      fotoUrl: this.selectedDeceased.fotoUrl || null
+    };
+
+    // Crear FormData
+    const formData = new FormData();
+    formData.append('difunto', new Blob([JSON.stringify(payload)], { type: 'application/json' }));
+
+    if (this.selectedFile) {
+      formData.append('file', this.selectedFile);
+    }
 
     if (this.isEditing && this.selectedDeceased.id) {
-      this.difuntoService.updateDifunto(this.selectedDeceased.id, toPayload(this.selectedDeceased) as any)
+      this.difuntoService.updateDifunto(this.selectedDeceased.id, formData)
         .subscribe({
           next: () => this.handleSuccess(),
           error: (err) => console.error("Error actualizando difunto:", err)
         });
     } else {
-      this.difuntoService.createDifunto(toPayload(this.selectedDeceased) as any)
+      this.difuntoService.createDifunto(formData)
         .subscribe({
           next: () => this.handleSuccess(),
           error: (err) => console.error("Error creando difunto:", err)
@@ -177,6 +244,11 @@ export class DeceasedManagementComponent implements OnInit {
         error: (err) => console.error("Error eliminando difunto:", err)
       });
     }
+  }
+
+  getPhotoUrl(filename: string | undefined): string {
+    if (!filename) return 'favicon.svg'; // Default avatar based on existing public asset
+    return `http://localhost:8080/api/difuntos/images/${filename}`;
   }
 
   getAge(fechaNacimiento: string): number {

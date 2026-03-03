@@ -15,12 +15,12 @@ export class DifuntoService {
     return this.http.get<any[]>(this.apiUrl);
   }
 
-  createDifunto(difunto: any): Observable<any> {
-    return this.http.post<any>(this.apiUrl, difunto);
+  createDifunto(data: any): Observable<any> {
+    return this.http.post<any>(this.apiUrl, data);
   }
 
-  updateDifunto(id: number, difunto: any): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/${id}`, difunto);
+  updateDifunto(id: number, data: any): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/${id}`, data);
   }
 
   deleteDifunto(id: number): Observable<void> {

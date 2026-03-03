@@ -21,55 +21,68 @@
       </thead>
       <tbody>
         @for (ayto of filteredAyuntamientos; track ayto.id) {
-          <tr>
-            <td>{{ ayto.id }}</td>
-            <td>{{ ayto.nombre }}</td>
-            <td>{{ ayto.direccion }}</td>
-            <td>{{ ayto.telefono }}</td>
-            <td class="actions">
-              <button class="btn-edit" (click)="openForm(ayto)" title="Editar">✏️</button>
-              <button class="btn-delete" (click)="deleteAyuntamiento(ayto.id)" title="Eliminar">🗑️</button>
-            </td>
-          </tr>
+        <tr>
+          <td>{{ ayto.id }}</td>
+          <td>{{ ayto.nombre }}</td>
+          <td>{{ ayto.direccion }}</td>
+          <td>{{ ayto.telefono }}</td>
+          <td class="actions">
+            <button class="btn-edit" (click)="openForm(ayto)" title="Editar">✏️</button>
+            <button class="btn-delete" (click)="deleteAyuntamiento(ayto.id)" title="Eliminar">🗑️</button>
+          </td>
+        </tr>
         }
       </tbody>
     </table>
     @if (filteredAyuntamientos.length === 0) {
-      <div class="empty-state">
-        <p>No hay ayuntamientos que coincidan con la búsqueda</p>
-      </div>
+    <div class="empty-state">
+      <p>No hay ayuntamientos que coincidan con la búsqueda</p>
+    </div>
     }
   </div>
 
-<!-- Formulario Modal -->
+  <!-- Formulario Modal -->
   @if (showForm) {
-    <div class="modal-overlay" (click)="closeForm()">
-      <div class="modal-content" (click)="$event.stopPropagation()">
-        <div class="modal-header">
-          <h3>{{ isEditing ? 'Editar Ayuntamiento' : 'Nuevo Ayuntamiento' }}</h3>
-          <button class="btn-close" (click)="closeForm()">✕</button>
+  <div class="modal-overlay" (click)="closeForm()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>{{ isEditing ? 'Editar Ayuntamiento' : 'Nuevo Ayuntamiento' }}</h3>
+        <button type="button" class="btn-close" (click)="closeForm()">✕</button>
+      </div>
+
+      <form #aytoForm="ngForm" (ngSubmit)="saveAyuntamiento()">
+
+        <div class="form-group">
+          <label>Nombre <span class="required">*</span></label>
+          <input type="text" name="nombre" [(ngModel)]="selectedAyuntamiento.nombre" #nombre="ngModel"
+            placeholder="Nombre del ayuntamiento" required />
+          <span class="error-text" *ngIf="nombre.invalid && (nombre.dirty || nombre.touched)">El nombre es
+            obligatorio.</span>
         </div>
 
         <div class="form-group">
-          <label>Nombre</label>
-          <input type="text" [(ngModel)]="selectedAyuntamiento.nombre" placeholder="Nombre del ayuntamiento" />
+          <label>Dirección <span class="required">*</span></label>
+          <input type="text" name="direccion" [(ngModel)]="selectedAyuntamiento.direccion" #direccion="ngModel"
+            placeholder="Dirección completa" required />
+          <span class="error-text" *ngIf="direccion.invalid && (direccion.dirty || direccion.touched)">La dirección es
+            obligatoria.</span>
         </div>
 
         <div class="form-group">
-          <label>Dirección</label>
-          <input type="text" [(ngModel)]="selectedAyuntamiento.direccion" placeholder="Dirección completa" />
-        </div>
-
-        <div class="form-group">
-          <label>Teléfono</label>
-          <input type="tel" [(ngModel)]="selectedAyuntamiento.telefono" placeholder="900000000" />
+          <label>Teléfono <span class="required">*</span></label>
+          <input type="tel" name="telefono" [(ngModel)]="selectedAyuntamiento.telefono" #telefono="ngModel"
+            placeholder="900000000" pattern="[0-9]{9}" required />
+          <span class="error-text" *ngIf="telefono.invalid && (telefono.dirty || telefono.touched)">Formato de teléfono
+            inválido (9 dígitos).</span>
         </div>
 
         <div class="modal-footer">
-          <button class="btn-cancel" (click)="closeForm()">Cancelar</button>
-          <button class="btn-save" (click)="saveAyuntamiento()">Guardar</button>
+          <button type="button" class="btn-cancel" (click)="closeForm()">Cancelar</button>
+          <button type="submit" class="btn-save" [disabled]="!aytoForm.form.valid">Guardar</button>
         </div>
-      </div>
+
+      </form>
     </div>
+  </div>
   }
 </div>

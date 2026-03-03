@@ -56,55 +56,68 @@
     <!-- Datos básicos -->
     <span class="modal-section-title">Datos del cementerio</span>
 
-    <div class="form-group">
-      <label>Nombre <span class="required">*</span></label>
-      <input type="text" [(ngModel)]="selectedCementerio.nombre" placeholder="Nombre del cementerio" />
-    </div>
+    <form #cemForm="ngForm" (ngSubmit)="saveCementerio()">
 
-    <div class="form-row">
       <div class="form-group">
-        <label>Población</label>
-        <input type="text" [(ngModel)]="selectedCementerio.poblacion" placeholder="Población" />
+        <label>Nombre <span class="required">*</span></label>
+        <input type="text" name="nombre" [(ngModel)]="selectedCementerio.nombre" #nombre="ngModel"
+          placeholder="Nombre del cementerio" required />
+        <span class="error-text" *ngIf="nombre.invalid && (nombre.dirty || nombre.touched)">El nombre es
+          obligatorio.</span>
       </div>
-      <div class="form-group">
-        <label>Provincia</label>
-        <input type="text" [(ngModel)]="selectedCementerio.provincia" placeholder="Provincia" />
-      </div>
-    </div>
 
-    <div class="form-row">
-      <div class="form-group">
-        <label>Dirección</label>
-        <input type="text" [(ngModel)]="selectedCementerio.direccion" placeholder="Dirección completa" />
+      <div class="form-row">
+        <div class="form-group">
+          <label>Población</label>
+          <input type="text" name="poblacion" [(ngModel)]="selectedCementerio.poblacion" placeholder="Población" />
+        </div>
+        <div class="form-group">
+          <label>Provincia</label>
+          <input type="text" name="provincia" [(ngModel)]="selectedCementerio.provincia" placeholder="Provincia" />
+        </div>
       </div>
-      <div class="form-group">
-        <label>Código Postal</label>
-        <input type="text" [(ngModel)]="selectedCementerio.codigoPostal" placeholder="00000" />
-      </div>
-    </div>
 
-    <div class="form-row">
-      <div class="form-group">
-        <label>Email de contacto</label>
-        <input type="email" [(ngModel)]="selectedCementerio.emailContacto" placeholder="correo@ejemplo.com" />
+      <div class="form-row">
+        <div class="form-group">
+          <label>Dirección</label>
+          <input type="text" name="direccion" [(ngModel)]="selectedCementerio.direccion"
+            placeholder="Dirección completa" />
+        </div>
+        <div class="form-group">
+          <label>Código Postal</label>
+          <input type="text" name="codigoPostal" [(ngModel)]="selectedCementerio.codigoPostal" placeholder="00000" />
+        </div>
       </div>
-      <div class="form-group">
-        <label>Ayuntamiento <span class="required">*</span></label>
-        <select [(ngModel)]="selectedCementerio.ayuntamiento" name="ayuntamientoSelect">
-          <option [ngValue]="undefined">— Selecciona un ayuntamiento —</option>
-          @for (ayto of ayuntamientos; track ayto.id) {
-          <option [ngValue]="ayto.id">{{ ayto.nombre }}</option>
-          }
-        </select>
-      </div>
-    </div>
 
-    <div class="modal-footer" style="margin-bottom:0;padding-bottom:0;border-bottom:none;">
-      <button class="btn-cancel" (click)="closeForm()">Cancelar</button>
-      <button class="btn-save" (click)="saveCementerio()">
-        {{ isEditing ? 'Actualizar datos' : 'Crear cementerio' }}
-      </button>
-    </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Email de contacto</label>
+          <input type="email" name="emailContacto" [(ngModel)]="selectedCementerio.emailContacto" #email="ngModel"
+            placeholder="correo@ejemplo.com" email />
+          <span class="error-text" *ngIf="email.invalid && (email.dirty || email.touched)">Formato de email
+            incorrecto.</span>
+        </div>
+        <div class="form-group">
+          <label>Ayuntamiento <span class="required">*</span></label>
+          <select [(ngModel)]="selectedCementerio.ayuntamiento" name="ayuntamientoSelect" #ayto="ngModel" required>
+            <option [ngValue]="undefined">— Selecciona un ayuntamiento —</option>
+            @for (ayto of ayuntamientos; track ayto.id) {
+            <option [ngValue]="ayto.id">{{ ayto.nombre }}</option>
+            }
+          </select>
+          <span class="error-text" *ngIf="ayto.invalid && (ayto.dirty || ayto.touched)">El ayuntamiento es
+            obligatorio.</span>
+        </div>
+      </div>
+
+      <div class="modal-footer" style="margin-bottom:0;padding-bottom:0;border-bottom:none;">
+        <button type="button" class="btn-cancel" (click)="closeForm()">Cancelar</button>
+        <button type="submit" class="btn-save" [disabled]="!cemForm.form.valid">
+          {{ isEditing ? 'Actualizar datos' : 'Crear cementerio' }}
+        </button>
+      </div>
+
+    </form>
 
     <!-- Zonas y Parcelas — solo al editar -->
     @if (isEditing && selectedCementerio.id) {
@@ -129,26 +142,31 @@
       <!-- Formulario nueva zona -->
       @if (showZonaForm) {
       <div class="inline-form">
-        <div class="form-row">
-          <div class="form-group">
-            <label>Nombre</label>
-            <input type="text" [(ngModel)]="nuevaZona.nombre" placeholder="Ej: Zona A, Sector Norte..." />
+        <form #zonaForm="ngForm" (ngSubmit)="saveZona()">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Nombre <span class="required">*</span></label>
+              <input type="text" name="zonaNombre" [(ngModel)]="nuevaZona.nombre" #zonaNombre="ngModel"
+                placeholder="Ej: Zona A, Sector Norte..." required />
+            </div>
+            <div class="form-group">
+              <label>Filas <span class="required">*</span></label>
+              <input type="number" name="zonaFilas" [(ngModel)]="nuevaZona.numeroFilas" #znaFil="ngModel" min="1"
+                required />
+            </div>
+            <div class="form-group">
+              <label>Columnas <span class="required">*</span></label>
+              <input type="number" name="zonaCols" [(ngModel)]="nuevaZona.numeroColumnas" #znaCol="ngModel" min="1"
+                required />
+            </div>
           </div>
-          <div class="form-group">
-            <label>Filas</label>
-            <input type="number" [(ngModel)]="nuevaZona.numeroFilas" min="1" />
+          <div class="inline-form-actions">
+            <button type="button" class="btn-cancel btn-sm" (click)="cancelZonaForm()">Cancelar</button>
+            <button type="submit" class="btn-save btn-sm" [disabled]="!zonaForm.form.valid || savingZona">
+              {{ savingZona ? 'Guardando...' : 'Guardar zona' }}
+            </button>
           </div>
-          <div class="form-group">
-            <label>Columnas</label>
-            <input type="number" [(ngModel)]="nuevaZona.numeroColumnas" min="1" />
-          </div>
-        </div>
-        <div class="inline-form-actions">
-          <button class="btn-cancel btn-sm" (click)="cancelZonaForm()">Cancelar</button>
-          <button class="btn-save btn-sm" (click)="saveZona()" [disabled]="savingZona">
-            {{ savingZona ? 'Guardando...' : 'Guardar zona' }}
-          </button>
-        </div>
+        </form>
       </div>
       }
 
@@ -202,53 +220,55 @@
       <div class="inline-form">
         <div class="inline-form-title">{{ isEditingParcela ? 'Editar parcela #' + editingParcelaId : 'Nueva parcela' }}
         </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>Zona <span class="required">*</span></label>
-            <select [(ngModel)]="selectedZonaId">
-              <option [ngValue]="null">— Selecciona zona —</option>
-              @for (z of zonas; track z.id) {
-              <option [ngValue]="z.id">{{ z.nombre || 'Zona ' + z.id }}</option>
-              }
-            </select>
+        <form #parcelaForm="ngForm" (ngSubmit)="saveParcela()">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Zona <span class="required">*</span></label>
+              <select name="pzona" [(ngModel)]="selectedZonaId" #parZona="ngModel" required>
+                <option [ngValue]="null">— Selecciona zona —</option>
+                @for (z of zonas; track z.id) {
+                <option [ngValue]="z.id">{{ z.nombre || 'Zona ' + z.id }}</option>
+                }
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Fila</label>
+              <input type="number" name="pfila" [(ngModel)]="nuevaParcela.fila" min="1" />
+            </div>
+            <div class="form-group">
+              <label>Columna</label>
+              <input type="number" name="pcol" [(ngModel)]="nuevaParcela.columna" min="1" />
+            </div>
           </div>
-          <div class="form-group">
-            <label>Fila</label>
-            <input type="number" [(ngModel)]="nuevaParcela.fila" min="1" />
+          <div class="form-row">
+            <div class="form-group">
+              <label>Tipo <span class="required">*</span></label>
+              <select name="ptipo" [(ngModel)]="nuevaParcela.tipo" required>
+                @for (t of tiposParcela; track t) {
+                <option [value]="t">{{ formatEnum(t) }}</option>
+                }
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Estado <span class="required">*</span></label>
+              <select name="pestado" [(ngModel)]="nuevaParcela.estado" required>
+                @for (e of estadosParcela; track e) {
+                <option [value]="e">{{ formatEnum(e) }}</option>
+                }
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Capacidad <span class="required">*</span></label>
+              <input type="number" name="pcap" [(ngModel)]="nuevaParcela.capacidad" min="1" max="20" required />
+            </div>
           </div>
-          <div class="form-group">
-            <label>Columna</label>
-            <input type="number" [(ngModel)]="nuevaParcela.columna" min="1" />
+          <div class="inline-form-actions">
+            <button type="button" class="btn-cancel btn-sm" (click)="cancelParcelaForm()">Cancelar</button>
+            <button type="submit" class="btn-save btn-sm" [disabled]="!parcelaForm.form.valid || savingParcela">
+              {{ savingParcela ? 'Guardando...' : (isEditingParcela ? 'Actualizar parcela' : 'Guardar parcela') }}
+            </button>
           </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>Tipo</label>
-            <select [(ngModel)]="nuevaParcela.tipo">
-              @for (t of tiposParcela; track t) {
-              <option [value]="t">{{ formatEnum(t) }}</option>
-              }
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Estado</label>
-            <select [(ngModel)]="nuevaParcela.estado">
-              @for (e of estadosParcela; track e) {
-              <option [value]="e">{{ formatEnum(e) }}</option>
-              }
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Capacidad</label>
-            <input type="number" [(ngModel)]="nuevaParcela.capacidad" min="1" max="20" />
-          </div>
-        </div>
-        <div class="inline-form-actions">
-          <button class="btn-cancel btn-sm" (click)="cancelParcelaForm()">Cancelar</button>
-          <button class="btn-save btn-sm" (click)="saveParcela()" [disabled]="savingParcela">
-            {{ savingParcela ? 'Guardando...' : (isEditingParcela ? 'Actualizar parcela' : 'Guardar parcela') }}
-          </button>
-        </div>
+        </form>
       </div>
       }
 
