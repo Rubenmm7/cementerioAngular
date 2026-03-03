@@ -90,7 +90,7 @@ export class DeceasedManagementComponent implements OnInit {
       this.isEditing = true;
       this.selectedDeceased = { ...item };
 
-      // Si ya tiene foto guardada, mostraremos la URL del backend temporalmente en la vista previa
+      // Mostrar la URL del backend temporalmente en la vista previa de la foto
       if (item.fotoUrl) {
         this.imagePreview = `http://localhost:8080/api/difuntos/images/${item.fotoUrl}`;
       }
@@ -186,7 +186,7 @@ export class DeceasedManagementComponent implements OnInit {
     this.imagePreview = null;
     this.selectedDeceased.fotoUrl = ''; // Limpiar referencia si existia
 
-    // Limpiar el valor del input file si está presente en el DOM
+    // Limpiar el valor del input file si persiste en DOM
     const fileInput = document.getElementById('fotoInput') as HTMLInputElement;
     if (fileInput) fileInput.value = '';
 

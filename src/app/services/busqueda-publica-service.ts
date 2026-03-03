@@ -8,8 +8,7 @@ import { Difunto } from '../models/difunto.model';
 })
 export class BusquedaPublicaService {
 
-  // Ajusta esta URL si tu endpoint en BusquedaPublicaController es diferente
-  private apiUrl = 'http://localhost:8080/api/public'; 
+  private apiUrl = 'http://localhost:8080/api/public';
 
   constructor(private http: HttpClient) { }
 
@@ -21,7 +20,7 @@ export class BusquedaPublicaService {
     if (nombre) params = params.set('nombre', nombre);
     if (apellido) params = params.set('apellido', apellido);
 
-    // Asumimos que el endpoint es /buscar o /difuntos dentro de api/public
+    // Endpoint de búsqueda (/buscar o /difuntos dentro de api/public)
     return this.http.get<Difunto[]>(`${this.apiUrl}/buscar`, { params });
   }
 }

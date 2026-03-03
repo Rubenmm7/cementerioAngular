@@ -56,21 +56,33 @@ export class AdminComponent implements OnInit {
   }
 
   cargarDatos(): void {
-    forkJoin({
+    const isSuper = this.isSuperAdmin();
+    const requests: any = {
       cementerios: this.cementerioService.getCementerios(),
-      ayuntamientos: this.ayuntamientoService.getAyuntamientos(),
-      difuntos: this.difuntoService.getDifuntos(),
-      usuarios: this.userService.getUsers()
-    }).subscribe({
-      next: (results) => {
+      difuntos: this.difuntoService.getDifuntos()
+    };
+
+    if (isSuper) {
+      requests.ayuntamientos = this.ayuntamientoService.getAyuntamientos();
+      requests.usuarios = this.userService.getUsers();
+    }
+
+    forkJoin(requests).subscribe({
+      next: (results: any) => {
         this.stats.totalCementerios = results.cementerios.length;
-        this.stats.totalAyuntamientos = results.ayuntamientos.length;
         this.stats.difuntosRegistrados = results.difuntos.length;
-        this.stats.totalUsuarios = results.usuarios.length;
+        if (isSuper) {
+          this.stats.totalAyuntamientos = results.ayuntamientos.length;
+          this.stats.totalUsuarios = results.usuarios.length;
+        }
         this.cdr.detectChanges(); // Forzar la actualización de la vista
       },
       error: (err) => console.error('Error cargando las estadísticas del dashboard:', err)
     });
+  }
+
+  isSuperAdmin(): boolean {
+    return this.authService.hasRole('SUPERADMIN');
   }
 
   toggleSidebar(): void {
@@ -79,6 +91,10 @@ export class AdminComponent implements OnInit {
 
   cambiarPestana(tab: string): void {
     this.activeTab = tab;
+    // Si se hace clic en el dashboard, recargar los datos frescos
+    if (tab === 'dashboard') {
+      this.cargarDatos();
+    }
     if (window.innerWidth <= 768) {
       this.sidebarOpen = false;
     }

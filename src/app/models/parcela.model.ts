@@ -1,6 +1,6 @@
 import { Zona } from "./zona.model";
 
-// Definimos los tipos exactos de tu Java (Enums)
+// Definimos los tipos
 export type TipoParcela = 'NICHO' | 'CRIPTA' | 'SUELO' | 'COLUMBARIO' | 'FOSA' | 'PANTEON';
 export type EstadoParcela = 'LIBRE' | 'OCUPADO' | 'RESERVADO' | 'MANTENIMIENTO';
 

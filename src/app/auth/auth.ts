@@ -7,12 +7,12 @@ import { JwtResponse } from '../models/jwt-response';
 @Injectable({
   providedIn: 'root'
 })
- 
+
 export class AuthService {
 
   private apiUrl = 'http://localhost:8080/api/auth';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   login(data: LoginRequest): Observable<JwtResponse> {
     return this.http.post<JwtResponse>(`${this.apiUrl}/login`, data);
@@ -40,13 +40,48 @@ export class AuthService {
   }
 
   hasRole(role: string): boolean {
-    const roles = JSON.parse(localStorage.getItem('roles') || '[]');
-    return roles.includes(role);
+    try {
+      const stored = localStorage.getItem('roles');
+      if (!stored) return false;
+      let parsed = JSON.parse(stored);
+
+      // Si por algún motivo el parseo devuelve un string que parece un array, parsearlo otra vez
+      if (typeof parsed === 'string' && parsed.startsWith('[')) {
+        parsed = JSON.parse(parsed);
+      }
+
+      const roles: string[] = Array.isArray(parsed) ? parsed : [parsed];
+
+      return roles.some(r => {
+        if (!r) return false;
+        const clean = r.toString().trim().toUpperCase();
+        const search = role.toString().trim().toUpperCase();
+        return clean === search || clean === `ROLE_${search}`;
+      });
+    } catch (e) {
+      console.error('Error parsing roles from localStorage', e);
+      return false;
+    }
   }
 
   getUserRole(): string {
-    const roles = JSON.parse(localStorage.getItem('roles') || '[]');
-    return roles.length > 0 ? roles[0] : '';
+    try {
+      const stored = localStorage.getItem('roles');
+      if (!stored) return '';
+      let parsed = JSON.parse(stored);
+
+      if (typeof parsed === 'string' && parsed.startsWith('[')) {
+        parsed = JSON.parse(parsed);
+      }
+
+      const roles: string[] = Array.isArray(parsed) ? parsed : [parsed];
+      if (roles.length > 0 && roles[0]) {
+        return roles[0].toString().trim().replace(/^ROLE_/i, '');
+      }
+    } catch (e) {
+      return '';
+    }
+    return '';
   }
 
   logout(): void {

@@ -31,8 +31,7 @@ export class Navbar implements OnInit {
   checkAuthStatus(): void {
     this.isLoggedIn = this.authService.isLoggedIn();
     if (this.isLoggedIn) {
-      const userRole = this.authService.getUserRole();
-      this.isAdmin = userRole === 'ROLE_SUPERADMIN';
+      this.isAdmin = this.authService.hasRole('SUPERADMIN') || this.authService.hasRole('OPERADOR');
     }
   }
 

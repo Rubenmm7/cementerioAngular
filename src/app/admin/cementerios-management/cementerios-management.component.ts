@@ -94,9 +94,6 @@ export class CementeriosManagementComponent implements OnInit {
     return { fila: 1, columna: 1, tipo: 'NICHO', estado: 'LIBRE', capacidad: 1 };
   }
 
-  // ── Helpers de visualización ──────────────────────────────────────────────
-
-  /** Convierte PANTEON → Panteón, COLUMBARIO → Columbario, etc. */
   formatEnum(value: string): string {
     if (!value) return '';
     const map: Record<string, string> = {
