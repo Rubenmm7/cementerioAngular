@@ -5,7 +5,8 @@
   </div>
 
   <div class="search-bar">
-    <input type="text" placeholder="Buscar por nombre, apellido o cementerio..." [(ngModel)]="searchTerm" class="search-input" />
+    <input type="text" placeholder="Buscar por nombre, apellido o cementerio..." [(ngModel)]="searchTerm"
+      class="search-input" />
   </div>
 
   <div class="table-container">
@@ -24,93 +25,128 @@
       </thead>
       <tbody>
         @for (item of filteredDeceased; track item.id) {
-          <tr>
-            <td>{{ item.id }}</td>
-            <td>{{ item.nombre }} {{ item.apellidos }}</td>
-            <td>{{ item.dni }}</td>
-            <td>
-              <small>{{ item.fechaNacimiento | date: 'dd/MM/yyyy' }} - {{ item.fechaDefuncion | date: 'dd/MM/yyyy' }}</small>
-            </td>
-            <td>{{ getAge(item.fechaNacimiento) }}</td>
-            <td>{{ item.nombreCementerio || 'Sin asignar' }}</td>
-            <td><span class="data-badge">{{ item.parcelaId || 'N/A' }}</span></td>
-            
-            <td class="actions">
-              <button class="btn-edit" (click)="openForm(item)" title="Editar">✏️</button>
-              <button class="btn-delete" (click)="deleteDeceased(item.id)" title="Eliminar">🗑️</button>
-            </td>
-          </tr>
+        <tr>
+          <td>{{ item.id }}</td>
+          <td>{{ item.nombre }} {{ item.apellidos }}</td>
+          <td>{{ item.dni }}</td>
+          <td>
+            <small>{{ item.fechaNacimiento | date: 'dd/MM/yyyy' }} - {{ item.fechaDefuncion | date: 'dd/MM/yyyy'
+              }}</small>
+          </td>
+          <td>{{ getAge(item.fechaNacimiento) }}</td>
+          <td>{{ item.nombreCementerio || 'Sin asignar' }}</td>
+          <td><span class="data-badge">{{ item.parcelaId || 'N/A' }}</span></td>
+
+          <td class="actions">
+            <button class="btn-edit" (click)="openForm(item)" title="Editar">✏️</button>
+            <button class="btn-delete" (click)="deleteDeceased(item.id)" title="Eliminar">🗑️</button>
+          </td>
+        </tr>
         }
       </tbody>
     </table>
     @if (filteredDeceased.length === 0) {
-      <div class="empty-state">
-        <p>No hay registros de difuntos que coincidan con la búsqueda</p>
-      </div>
+    <div class="empty-state">
+      <p>No hay registros de difuntos que coincidan con la búsqueda</p>
+    </div>
     }
   </div>
 
   @if (showForm) {
-    <div class="modal-overlay" (click)="closeForm()">
-      <div class="modal-content" (click)="$event.stopPropagation()">
-        <div class="modal-header">
-          <h3>{{ isEditing ? 'Editar Registro' : 'Nuevo Registro de Difunto' }}</h3>
-          <button class="btn-close" (click)="closeForm()">✕</button>
+  <div class="modal-overlay" (click)="closeForm()">
+    <div class="modal-content deceased-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>{{ isEditing ? 'Editar Registro' : 'Nuevo Registro de Difunto' }}</h3>
+        <button class="btn-close" (click)="closeForm()">✕</button>
+      </div>
+
+      <!-- Fila 1: DNI, Nombre, Apellidos -->
+      <div class="form-row">
+        <div class="form-group">
+          <label>DNI</label>
+          <input type="text" [(ngModel)]="selectedDeceased.dni" placeholder="12345678X" />
         </div>
 
-        <div class="form-row">
-          <div class="form-group">
-            <label>DNI</label>
-            <input type="text" [(ngModel)]="selectedDeceased.dni" placeholder="12345678X" />
-          </div>
-
-          <div class="form-group">
-            <label>Nombre</label>
-            <input type="text" [(ngModel)]="selectedDeceased.nombre" placeholder="Nombre" />
-          </div>
-
-          <div class="form-group">
-            <label>Apellidos</label>
-            <input type="text" [(ngModel)]="selectedDeceased.apellidos" placeholder="Apellidos" />
-          </div>
+        <div class="form-group">
+          <label>Nombre <span class="required">*</span></label>
+          <input type="text" [(ngModel)]="selectedDeceased.nombre" placeholder="Nombre" />
         </div>
 
-        <div class="form-row">
-          <div class="form-group">
-            <label>Fecha de Nacimiento</label>
-            <input type="date" [(ngModel)]="selectedDeceased.fechaNacimiento" />
-          </div>
-
-          <div class="form-group">
-            <label>Fecha de Defunción</label>
-            <input type="date" [(ngModel)]="selectedDeceased.fechaDefuncion" />
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label>Fecha de Enterramiento</label>
-            <input type="date" [(ngModel)]="selectedDeceased.fechaEnterramiento" />
-          </div>
-          
-           <div class="form-group">
-            <label>ID Parcela</label>
-            <input type="number" [(ngModel)]="selectedDeceased.parcelaId" placeholder="ID numérico de la parcela" />
-          </div>
-        </div>
-        
-        <div class="form-row">
-            <div class="form-group" style="width: 100%;">
-                <label>Biografía (Opcional)</label>
-                <textarea [(ngModel)]="selectedDeceased.biografia" rows="3"></textarea>
-            </div>
-        </div>
-
-        <div class="modal-footer">
-          <button class="btn-cancel" (click)="closeForm()">Cancelar</button>
-          <button class="btn-save" (click)="saveDeceased()">Guardar</button>
+        <div class="form-group">
+          <label>Apellidos <span class="required">*</span></label>
+          <input type="text" [(ngModel)]="selectedDeceased.apellidos" placeholder="Apellidos" />
         </div>
       </div>
+
+      <!-- Fila 2: Fechas -->
+      <div class="form-row">
+        <div class="form-group">
+          <label>Fecha de Nacimiento</label>
+          <input type="date" [(ngModel)]="selectedDeceased.fechaNacimiento" />
+        </div>
+
+        <div class="form-group">
+          <label>Fecha de Defunción</label>
+          <input type="date" [(ngModel)]="selectedDeceased.fechaDefuncion" />
+        </div>
+
+        <div class="form-group">
+          <label>Fecha de Enterramiento</label>
+          <input type="date" [(ngModel)]="selectedDeceased.fechaEnterramiento" />
+        </div>
+      </div>
+
+      <!-- Fila 3: Cementerio + Parcela -->
+      <div class="form-row">
+        <div class="form-group form-group--full">
+          <label>Cementerio</label>
+          <select [ngModel]="selectedCementerioId" (ngModelChange)="onCementerioChange($event)">
+            <option [ngValue]="null">— Sin cementerio asignado —</option>
+            @for (cem of cementerios; track cem.id) {
+            <option [ngValue]="cem.id">{{ cem.nombre }}
+              @if (cem.poblacion) { — {{ cem.poblacion }} }
+            </option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group form-group--full">
+          <label>Parcela <span class="label-optional">(opcional)</span></label>
+          @if (!selectedCementerioId) {
+          <select disabled>
+            <option>— Selecciona un cementerio primero —</option>
+          </select>
+          <small class="field-hint">Elige un cementerio para ver sus parcelas disponibles.</small>
+          } @else if (parcelas.length === 0) {
+          <select disabled>
+            <option>— Este cementerio no tiene parcelas —</option>
+          </select>
+          } @else {
+          <select [ngModel]="selectedParcelaId" (ngModelChange)="selectedParcelaId = $event">
+            <option [ngValue]="null">— Sin parcela asignada —</option>
+            @for (p of parcelas; track p.id) {
+            <option [ngValue]="p.id">{{ parcelaLabel(p) }}</option>
+            }
+          </select>
+          }
+        </div>
+      </div>
+
+      <!-- Fila 4: Biografía -->
+      <div class="form-row">
+        <div class="form-group form-group--full">
+          <label>Biografía <span class="label-optional">(opcional)</span></label>
+          <textarea [(ngModel)]="selectedDeceased.biografia" rows="4"
+            placeholder="Escribe aquí una breve descripción o nota sobre el difunto..."></textarea>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="closeForm()">Cancelar</button>
+        <button class="btn-save" (click)="saveDeceased()">Guardar</button>
+      </div>
     </div>
+  </div>
   }
+
 </div>

@@ -6,26 +6,27 @@
     </div>
 
     <ul class="menu">
-<li><a (click)="irAInicio()" class="menu-link" style="cursor: pointer;">Inicio</a></li>      <li><a href="#funcionalidades" class="menu-link">Funcionalidades</a></li>
-      <li><a href="#usuario" class="menu-link">Usuarios</a></li>
+      <li><a (click)="irAInicio()" class="menu-link" style="cursor: pointer;">Inicio</a></li>
+      <li><a href="#funcionalidades" class="menu-link">Funcionalidades</a></li>
+      <li><a routerLink="/busqueda" class="menu-link">Busqueda</a></li>
       <li><a href="#contacto" class="menu-link">Contacto</a></li>
     </ul>
 
     <div class="navbar-actions">
       @if (isAdmin) {
-        <button class="admin-btn" (click)="goToAdmin()">
-          Panel de Administrador
-        </button>
+      <button class="admin-btn" (click)="goToAdmin()">
+        Panel de Administrador
+      </button>
       }
-      
+
       @if (!isLoggedIn) {
-        <button routerLink="/login" class="login-btn">
-          Acceder
-        </button>
+      <button routerLink="/login" class="login-btn">
+        Acceder
+      </button>
       } @else {
-        <button class="logout-btn" (click)="logout()">
-          Cerrar Sesión
-        </button>
+      <button class="logout-btn" (click)="logout()">
+        Cerrar Sesión
+      </button>
       }
     </div>
   </div>

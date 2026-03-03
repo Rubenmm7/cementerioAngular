@@ -5,6 +5,16 @@
   min-height: calc(100vh - 200px);
 }
 
+.error-bar {
+  background: rgba(217, 83, 79, 0.15);
+  border: 1px solid rgba(217, 83, 79, 0.4);
+  color: #e88585;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  margin-bottom: 14px;
+}
+
 .management-header {
   display: flex;
   justify-content: space-between;
@@ -233,6 +243,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -255,6 +266,7 @@
     transform: translateY(30px);
     opacity: 0;
   }
+
   to {
     transform: translateY(0);
     opacity: 1;
@@ -303,22 +315,39 @@
 }
 
 .form-group input,
-.form-group select {
+.form-group select,
+.form-group textarea {
   width: 100%;
   padding: 12px;
-  background: rgba(82, 183, 136, 0.1);
+  background: rgba(15, 25, 20, 0.85);
   border: 1px solid rgba(82, 183, 136, 0.3);
   border-radius: 6px;
   color: #e8f5e9;
   font-size: 14px;
+  font-family: inherit;
+  box-sizing: border-box;
   transition: all 0.3s ease;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+/* Opciones del select: fondo oscuro con texto claro */
+.form-group select option {
+  background: #0f1914;
+  color: #e8f5e9;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: rgba(232, 245, 233, 0.4);
 }
 
 .form-group input:focus,
-.form-group select:focus {
+.form-group select:focus,
+.form-group textarea:focus {
   outline: none;
   border-color: #52B788;
-  background: rgba(82, 183, 136, 0.15);
+  background: rgba(15, 25, 20, 0.95);
   box-shadow: 0 0 12px rgba(82, 183, 136, 0.2);
 }
 
@@ -399,4 +428,244 @@
     width: 95%;
     padding: 20px;
   }
+}
+
+/* ============================================================
+   DECEASED MODAL — wider layout & textarea improvements
+   ============================================================ */
+
+/* Modal más ancho para el formulario de difuntos */
+.deceased-modal {
+  max-width: 720px;
+}
+
+/* form-row puede ser 3 columnas cuando el espacio lo permite */
+.deceased-modal .form-row {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+/* Campo de ancho completo que rompe el grid */
+.form-group--full {
+  grid-column: 1 / -1;
+}
+
+/* Textarea mejorada */
+.form-group textarea {
+  resize: vertical;
+  min-height: 90px;
+  line-height: 1.6;
+}
+
+/* Texto de ayuda bajo un campo */
+.field-hint {
+  display: block;
+  margin-top: 6px;
+  font-size: 12px;
+  color: rgba(82, 183, 136, 0.6);
+  font-style: italic;
+}
+
+/* Marcador de campo obligatorio */
+.required {
+  color: #d9756d;
+  margin-left: 2px;
+}
+
+/* Etiqueta "(opcional)" */
+.label-optional {
+  font-size: 11px;
+  font-weight: 400;
+  color: rgba(232, 245, 233, 0.4);
+  margin-left: 4px;
+  text-transform: none;
+}
+
+/* ============================================================
+   CEMENTERIO MODAL — wider + parcela section
+   ============================================================ */
+
+.cementerio-modal {
+  max-width: 780px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* Separator title inside modal */
+.modal-section-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: rgba(82, 183, 136, 0.7);
+  margin: 22px 0 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(82, 183, 136, 0.12);
+  display: block;
+}
+
+/* Parcela section wrapper */
+.parcela-section {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 2px solid rgba(82, 183, 136, 0.15);
+}
+
+.parcela-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.btn-add-secondary {
+  background: rgba(82, 183, 136, 0.1);
+  border: 1px solid rgba(82, 183, 136, 0.35);
+  color: #52B788;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.btn-add-secondary:hover:not(:disabled) {
+  background: rgba(82, 183, 136, 0.2);
+  transform: translateY(-1px);
+}
+
+.btn-add-secondary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.parcela-empty {
+  color: rgba(232, 245, 233, 0.4);
+  font-size: 0.85rem;
+  font-style: italic;
+  margin: 8px 0;
+}
+
+/* Zona chips */
+.zona-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.zona-chip {
+  background: rgba(82, 183, 136, 0.12);
+  border: 1px solid rgba(82, 183, 136, 0.25);
+  color: #b5dcc0;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+}
+
+/* Mini parcela table */
+.parcela-table-wrap {
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid rgba(82, 183, 136, 0.12);
+  margin-bottom: 8px;
+}
+
+.parcela-mini-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+
+.parcela-mini-table th {
+  padding: 8px 10px;
+  background: rgba(82, 183, 136, 0.1);
+  color: #52B788;
+  text-align: left;
+  font-weight: 600;
+}
+
+.parcela-mini-table td {
+  padding: 7px 10px;
+  border-bottom: 1px solid rgba(82, 183, 136, 0.07);
+  color: rgba(232, 245, 233, 0.85);
+}
+
+/* Tipo / Estado badges */
+.tipo-badge,
+.estado-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.tipo-badge {
+  background: rgba(82, 183, 136, 0.12);
+  color: #7dd4aa;
+}
+
+.estado-badge {
+  background: rgba(150, 150, 150, 0.12);
+  color: rgba(232, 245, 233, 0.6);
+}
+
+.estado-libre {
+  background: rgba(82, 183, 136, 0.2);
+  color: #52B788;
+}
+
+.estado-ocupado {
+  background: rgba(217, 117, 109, 0.2);
+  color: #d9756d;
+}
+
+.estado-reservado {
+  background: rgba(230, 150, 50, 0.2);
+  color: #e69632;
+}
+
+.estado-mantenimiento {
+  background: rgba(60, 130, 220, 0.2);
+  color: #5c9ce6;
+}
+
+/* Inline sub-form */
+.inline-form {
+  background: rgba(10, 20, 15, 0.5);
+  border: 1px solid rgba(82, 183, 136, 0.15);
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 10px;
+  animation: fadeIn 0.2s ease;
+}
+
+.inline-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.btn-sm {
+  padding: 7px 16px;
+  font-size: 0.85rem;
+}
+
+.btn-xs {
+  padding: 2px 8px;
+  font-size: 0.8rem;
+  border-radius: 4px;
+}
+
+.inline-form-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #52B788;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 10px;
 }

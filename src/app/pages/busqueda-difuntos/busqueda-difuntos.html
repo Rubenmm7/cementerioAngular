@@ -2,22 +2,25 @@
 
 <div class="search-page-container">
 
+  <!-- HERO SECTION -->
   <section class="search-hero">
+    <div class="hero-overlay"></div>
     <div class="hero-content">
-      <h1>Buscador de Difuntos</h1>
-      <p>Localiza a tus seres queridos seleccionando el ayuntamiento o cementerio.</p>
+      <div class="hero-accent-top"></div>
+      <h1 class="hero-title">Buscador de Difuntos</h1>
+      <div class="hero-divider"></div>
+      <p class="hero-subtitle">Localiza a tus seres queridos en los cementerios municipales</p>
 
+      <!-- SEARCH BOX -->
       <div class="search-box">
         <div class="form-grid">
 
           <div class="form-group">
             <label>Ayuntamiento</label>
-            <select [(ngModel)]="selectedAyuntamientoId" (change)="onAyuntamientoChange()">
-              <option [ngValue]="null">-- Todos los Ayuntamientos --</option>
+            <select [ngModel]="selectedAyuntamientoId" (ngModelChange)="onAyuntamientoChange($event)">
+              <option [ngValue]="null">— Todos los Ayuntamientos —</option>
               @for (ayunt of ayuntamientos; track ayunt.id) {
-                <option [value]="ayunt.id">
-                  {{ ayunt.nombre }}
-                </option>
+              <option [value]="ayunt.id">{{ ayunt.nombre }}</option>
               }
             </select>
           </div>
@@ -25,33 +28,33 @@
           <div class="form-group">
             <label>Cementerio</label>
             <select [(ngModel)]="selectedCementerioId" [disabled]="!selectedAyuntamientoId">
-              <option [ngValue]="null">-- Selecciona Cementerio --</option>
+              <option [ngValue]="null">— Selecciona Cementerio —</option>
               @for (cem of cementeriosFiltrados; track cem.id) {
-                <option [value]="cem.id">
-                  {{ cem.nombre }}
-                </option>
+              <option [value]="cem.id">{{ cem.nombre }}</option>
               }
             </select>
           </div>
 
           <div class="form-group">
             <label>Nombre</label>
-            <input type="text" placeholder="Nombre..." [(ngModel)]="nombreBusqueda">
+            <input type="text" placeholder="Nombre del difunto..." [(ngModel)]="nombreBusqueda">
           </div>
 
           <div class="form-group">
             <label>Apellidos</label>
-            <input type="text" placeholder="Apellidos..." [(ngModel)]="apellidoBusqueda">
+            <input type="text" placeholder="Apellidos del difunto..." [(ngModel)]="apellidoBusqueda">
           </div>
         </div>
 
         <div class="form-actions">
-          <button class="btn-clean" (click)="limpiarFiltros()">Limpiar</button>
-          <button class="btn-search" (click)="buscar()">
+          <button class="btn-clean" (click)="limpiarFiltros()">
+            <span>Limpiar</span>
+          </button>
+          <button class="btn-search" (click)="buscar()" [disabled]="isLoading">
             @if (!isLoading) {
-              <span>Buscar</span>
+            <span>Buscar</span>
             } @else {
-              <span>Buscando...</span>
+            <span class="loading-dots">Buscando</span>
             }
           </button>
         </div>
@@ -59,47 +62,137 @@
     </div>
   </section>
 
+  <!-- RESULTS SECTION -->
   <section class="results-section">
     <div class="container">
 
+      @if (isLoading) {
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Buscando difuntos...</p>
+      </div>
+      }
+
       @if (resultados.length === 0 && hasSearched && !isLoading) {
-        <div class="no-results">
-          <p>No se encontraron resultados con los criterios seleccionados.</p>
-        </div>
+      <div class="no-results">
+        <div class="no-results-icon">—</div>
+        <h3>Sin resultados</h3>
+        <p>No se encontraron difuntos con los criterios indicados.</p>
+      </div>
+      }
+
+      @if (resultados.length > 0 && !isLoading) {
+      <div class="results-header">
+        <h2>Resultados <span class="results-count">{{ resultados.length }} encontrados</span></h2>
+      </div>
       }
 
       <div class="results-grid">
         @for (difunto of resultados; track difunto.id) {
-          <div class="result-card">
-            <div class="card-header">
-              <h3>{{ difunto.nombre }} {{ difunto.apellidos }}</h3>
-            </div>
-            <div class="card-body">
-              
-              <div class="info-row">
-                <span class="label">Fecha Defunción:</span>
-                <span class="value">{{ difunto.fechaDefuncion | date:'dd/MM/yyyy' }}</span>
-              </div>
-
-              @if (difunto.nombreCementerio) {
-                <div class="info-row">
-                  <span class="label">Cementerio:</span>
-                  <span class="value">{{ difunto.nombreCementerio }}</span>
-                </div>
-              }
-
-              @if (difunto.parcelaId) {
-                <div class="info-row">
-                  <span class="label">Ubicación:</span>
-                  <span class="value">Parcela #{{ difunto.parcelaId }}</span>
-                </div>
-              }
-              
-            </div>
+        <div class="result-card" (click)="abrirModal(difunto)" role="button" tabindex="0"
+          (keydown.enter)="abrirModal(difunto)">
+          <div class="card-header">
+            <div class="card-avatar">{{ difunto.nombre[0] }}{{ difunto.apellidos[0] }}</div>
+            <h3>{{ difunto.nombre }} {{ difunto.apellidos }}</h3>
           </div>
+          <div class="card-body">
+
+            <div class="info-row">
+              <span class="label">Fecha Defunción</span>
+              <span class="value">{{ difunto.fechaDefuncion | date:'dd/MM/yyyy' }}</span>
+            </div>
+
+            @if (difunto.nombreCementerio) {
+            <div class="info-row">
+              <span class="label">Cementerio</span>
+              <span class="value">{{ difunto.nombreCementerio }}</span>
+            </div>
+            }
+
+            @if (difunto.parcelaId) {
+            <div class="info-row">
+              <span class="label">Ubicación</span>
+              <span class="value">Parcela #{{ difunto.parcelaId }}</span>
+            </div>
+            }
+
+            <div class="card-cta">Ver detalles →</div>
+
+          </div>
+        </div>
         }
       </div>
 
     </div>
   </section>
 </div>
+
+<!-- MODAL DETALLE DIFUNTO -->
+@if (difuntoSeleccionado) {
+<div class="modal-backdrop" (click)="cerrarModal()">
+  <div class="modal-panel" (click)="$event.stopPropagation()">
+
+    <button class="modal-close" (click)="cerrarModal()" aria-label="Cerrar">✕</button>
+
+    <div class="modal-avatar">
+      {{ difuntoSeleccionado.nombre[0] }}{{ difuntoSeleccionado.apellidos[0] }}
+    </div>
+
+    <h2 class="modal-name">{{ difuntoSeleccionado.nombre }} {{ difuntoSeleccionado.apellidos }}</h2>
+    <div class="modal-divider"></div>
+
+    <div class="modal-info-grid">
+
+      <div class="modal-info-block">
+        <span class="modal-label">Fecha de Defunción</span>
+        <span class="modal-value">{{ difuntoSeleccionado.fechaDefuncion | date:'dd/MM/yyyy' }}</span>
+      </div>
+
+      @if (difuntoSeleccionado.fechaNacimiento) {
+      <div class="modal-info-block">
+        <span class="modal-label">Fecha de Nacimiento</span>
+        <span class="modal-value">{{ difuntoSeleccionado.fechaNacimiento | date:'dd/MM/yyyy' }}</span>
+      </div>
+      }
+
+      @if (difuntoSeleccionado.nombreCementerio) {
+      <div class="modal-info-block">
+        <span class="modal-label">Cementerio</span>
+        <span class="modal-value">{{ difuntoSeleccionado.nombreCementerio }}</span>
+      </div>
+      }
+
+      @if (difuntoSeleccionado.parcelaId) {
+      <div class="modal-info-block">
+        <span class="modal-label">Parcela</span>
+        <span class="modal-value">#{{ difuntoSeleccionado.parcelaId }}</span>
+      </div>
+      }
+
+      @if (difuntoSeleccionado.dni) {
+      <div class="modal-info-block">
+        <span class="modal-label">DNI</span>
+        <span class="modal-value">{{ difuntoSeleccionado.dni }}</span>
+      </div>
+      }
+
+      @if (difuntoSeleccionado.fechaEnterramiento) {
+      <div class="modal-info-block">
+        <span class="modal-label">Fecha de Enterramiento</span>
+        <span class="modal-value">{{ difuntoSeleccionado.fechaEnterramiento | date:'dd/MM/yyyy' }}</span>
+      </div>
+      }
+
+      @if (difuntoSeleccionado.biografia) {
+      <div class="modal-info-block modal-info-block--full">
+        <div>
+          <span class="modal-label">Biografía</span>
+          <p class="modal-bio">{{ difuntoSeleccionado.biografia }}</p>
+        </div>
+      </div>
+      }
+
+    </div>
+  </div>
+</div>
+}
